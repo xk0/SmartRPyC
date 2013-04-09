@@ -8,6 +8,11 @@ A smart RPC library for Python, powered by ZeroMQ.
 :url: https://github.com/rshk/SmartRPyC
 
 
+.. image:: https://travis-ci.org/rshk/SmartRPyC.png
+    :alt: Build status
+    :target: https://travis-ci.org/rshk/SmartRPyC
+
+
 Installing
 ==========
 
