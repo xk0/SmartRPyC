@@ -206,79 +206,78 @@ class SmartRPCTest(unittest.TestCase):
             client.raise_value_error()
 
 
-# noinspection PyUnusedLocal
-class SmartrpcMiddlewareTest(unittest.TestCase):
-    def setUp(self):
-        self.addr = addresses = get_random_ipc_socket()
-        lock = Lock()
-
-        def run_rpc_daemon():
-            methods = MethodsRegister()
-
-            @methods.register
-            def method1(request):
-                return u"Hello, world!"
-
-            @methods.register
-            def method2(request):
-                return u"Hello, world! #2"
-            method2.login_required = True
-
-            @methods.register
-            def raise_value_error(request, *a, **kw):
-                raise ValueError
-
-            class DummyLoginMiddleware(object):
-                # noinspection PyUnusedLocal
-                def pre(self, request, method):
-                    auth = request.raw.get('auth')
-                    if auth != ['user', 'password']:
-                        raise ValueError("Login failed")
-
-            class UppercaseMiddleware(object):
-                # noinspection PyUnusedLocal
-                def post(self, request, method, response, exception):
-                    return response.upper()
-
-            addresses = self.addr
-            middleware = [DummyLoginMiddleware(), UppercaseMiddleware()]
-
-            rpc = Server(methods, addresses)
-            if middleware is not None:
-                rpc.middleware[:] = middleware[:]
-
-            lock.release()
-            rpc.run()
-
-        self.proc = Process(target=run_rpc_daemon)
-        self.proc.daemon = True
-        lock.acquire()
-        self.proc.start()
-        lock.acquire()
-
-    def tearDown(self):
-        self.proc.terminate()
-
-    def test_without_login(self):
-        client = Client(self.addr)
-
-        with self.assertRaises(RemoteException):
-            client.method1()
-
-        with self.assertRaises(RemoteException):
-            client.method2()
-
-    def test_with_login(self):
-        class ClientLoginMiddleware(object):
-            def __init__(self, username, password):
-                self.username, self.password = username, password
-
-            def pre(self, request):
-                request['auth'] = (self.username, self.password)
-                return request
-
-        client = Client(self.addr)
-        client.middleware.append(ClientLoginMiddleware('user', 'password'))
-
-        self.assertEqual(u'HELLO, WORLD!', client.method1())
-        self.assertEqual(u'HELLO, WORLD! #2', client.method2())
+# class SmartrpcMiddlewareTest(unittest.TestCase):
+#     def setUp(self):
+#         self.addr = addresses = get_random_ipc_socket()
+#         lock = Lock()
+#
+#         def run_rpc_daemon():
+#             methods = MethodsRegister()
+#
+#             @methods.register
+#             def method1(request):
+#                 return u"Hello, world!"
+#
+#             @methods.register
+#             def method2(request):
+#                 return u"Hello, world! #2"
+#             method2.login_required = True
+#
+#             @methods.register
+#             def raise_value_error(request, *a, **kw):
+#                 raise ValueError
+#
+#             class DummyLoginMiddleware(object):
+#                 # noinspection PyUnusedLocal
+#                 def pre(self, request, method):
+#                     auth = request.raw.get('auth')
+#                     if auth != ['user', 'password']:
+#                         raise ValueError("Login failed")
+#
+#             class UppercaseMiddleware(object):
+#                 # noinspection PyUnusedLocal
+#                 def post(self, request, method, response, exception):
+#                     return response.upper()
+#
+#             addresses = self.addr
+#             middleware = [DummyLoginMiddleware(), UppercaseMiddleware()]
+#
+#             rpc = Server(methods, addresses)
+#             if middleware is not None:
+#                 rpc.middleware[:] = middleware[:]
+#
+#             lock.release()
+#             rpc.run()
+#
+#         self.proc = Process(target=run_rpc_daemon)
+#         self.proc.daemon = True
+#         lock.acquire()
+#         self.proc.start()
+#         lock.acquire()
+#
+#     def tearDown(self):
+#         self.proc.terminate()
+#
+#     def test_without_login(self):
+#         client = Client(self.addr)
+#
+#         with self.assertRaises(RemoteException):
+#             client.method1()
+#
+#         with self.assertRaises(RemoteException):
+#             client.method2()
+#
+#     def test_with_login(self):
+#         class ClientLoginMiddleware(object):
+#             def __init__(self, username, password):
+#                 self.username, self.password = username, password
+#
+#             def pre(self, request):
+#                 request['auth'] = (self.username, self.password)
+#                 return request
+#
+#         client = Client(self.addr)
+#         client.middleware.append(ClientLoginMiddleware('user', 'password'))
+#
+#         self.assertEqual(u'HELLO, WORLD!', client.method1())
+#         self.assertEqual(u'HELLO, WORLD! #2', client.method2())
