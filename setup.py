@@ -5,7 +5,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='smartrpyc',
+    name='SmartRPyC',
     version='0.1-beta',
     packages=find_packages(),
     url='',
