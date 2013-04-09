@@ -11,6 +11,7 @@ import zmq
 import msgpack
 
 from smartrpyc import MethodsRegister, Server, Client, RemoteException
+from smartrpyc.utils import get_random_ipc_socket
 
 
 class ExampleRpcProcess(Process):
@@ -63,7 +64,7 @@ class SmartRPCTest(unittest.TestCase):
         def raise_value_error(request, *a, **kw):
             raise ValueError
 
-        self.addr = 'ipc:///tmp/smartrpc-test.sock'
+        self.addr = get_random_ipc_socket()
         self.rpc_process = ExampleRpcProcess(methods, self.addr)
         self.rpc_process.start()
 
@@ -208,7 +209,7 @@ class SmartRPCTest(unittest.TestCase):
 # noinspection PyUnusedLocal
 class SmartrpcMiddlewareTest(unittest.TestCase):
     def setUp(self):
-        self.addr = addresses = 'ipc:///tmp/smartrpc-test.sock'
+        self.addr = addresses = get_random_ipc_socket()
         lock = Lock()
 
         def run_rpc_daemon():

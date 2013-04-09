@@ -18,3 +18,10 @@ def lazy_property(fn):
         delattr(self, attr_name)
 
     return property(fget=getter, fset=setter, fdel=deleter, doc=fn.__doc__)
+
+
+def get_random_ipc_socket():
+    import tempfile, os
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.sock') as s:
+        os.unlink(s.name)
+    return 'ipc://{}'.format(s.name)
