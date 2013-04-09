@@ -3,14 +3,13 @@ SmartRPyC
 
 A smart RPC library for Python, powered by ZeroMQ.
 
+.. image:: https://travis-ci.org/rshk/SmartRPyC.png
+:alt: Build status
+    :target: https://travis-ci.org/rshk/SmartRPyC
+
 :author: Samuele Santi
 :version: 0.1-beta
 :url: https://github.com/rshk/SmartRPyC
-
-
-.. image:: https://travis-ci.org/rshk/SmartRPyC.png
-    :alt: Build status
-    :target: https://travis-ci.org/rshk/SmartRPyC
 
 
 Installing
