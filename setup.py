@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='SmartRPyC',
-    version='0.1-beta',
+    version='0.1-beta1',
     packages=find_packages(),
     url='',
     license='Apache License, Version 2.0, January 2004',
