@@ -95,24 +95,24 @@ class Request(object):
 class Server(object):
     request_class = Request
 
-    def __init__(self, methods=None, addresses=None):
+    def __init__(self, addresses, methods=None):
         """
         Constructor for the RPC Server class
 
+        :param addresses:
+            A (list of) address(es) to which to bind the server.
         :param methods:
             Methods to be exposed via RPC. Usually a ``MethodsRegister``
             instance, but this is not mandatory.
             It has to have a ``lookup(name)`` method, returning
             the specified method, or raising an exception if the method
             was not found.
-        :param addresses:
-            A (list of) address(es) to which to bind the server.
         """
-        if methods is None:
-            methods = MethodsRegister()
         self.methods = methods
-        if addresses is not None:
-            self.bind(addresses)
+        if self.methods is None:
+            self.methods = MethodsRegister()
+
+        self.bind(addresses)
         self.middleware = []  # Middleware chain
 
     @lazy_property
