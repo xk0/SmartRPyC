@@ -7,9 +7,9 @@
     in your project or subclass this.
 """
 
-from .exceptions import LoginRequired, NotAuthorized
-from .utils import lazy_property
-from .base_server import Request, Server, ServerMiddlewareBase
+from smartrpyc.utils import lazy_property
+from smartrpyc.exceptions import LoginRequired, NotAuthorized
+from smartrpyc.server import Request, Server, ServerMiddlewareBase
 
 
 class PublicRequest(Request):

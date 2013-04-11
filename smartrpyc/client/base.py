@@ -5,7 +5,7 @@ SmartRPC client
 import msgpack
 import zmq
 
-from .utils import lazy_property
+from smartrpyc.utils import lazy_property
 
 __all__ = ['Client', 'RemoteException']
 

@@ -2,7 +2,7 @@
 "Public API" client
 """
 
-from .base_client import Client
+from smartrpyc.client import Client
 
 
 class PublicClient(Client):

@@ -7,7 +7,7 @@ import logging
 import zmq
 import msgpack
 
-from .utils import lazy_property
+from smartrpyc.utils import lazy_property
 
 __all__ = ['MethodsRegister', 'Server', 'Request']
 
