@@ -51,15 +51,8 @@ class MethodsRegister(object):
         # function itself.
         name = name or callable(func) and func.__name__
 
-        if not name and not callable(func):
-            # If we get here, most likely, the user has passed
-            # a non callable function. See unittest for a clearer
-            # example.
-            raise ValueError("Unsupported arguments to register: "
-                             "{} and {}".format(name, func))
-
         def decorator(func):
-            self._methods[name] = func
+            self.store(name, func)
             return func
 
         # If func is not None, it means the method
@@ -68,6 +61,24 @@ class MethodsRegister(object):
         # registered by calling decorator, otherwise,
         # decorator will be returned.
         return func and decorator(func) or decorator
+
+    def store(self, name, function):
+        """
+        Method used to finally register a
+        function.
+
+        :params name:
+            Functions lookup name
+        :params function:
+            Callable function
+        """
+        if not isinstance(name, basestring) and not callable(function):
+            # If we get here, most likely, the user has passed
+            # a non callable function. See unittest for a clearer
+            # example.
+            raise ValueError("Unsupported arguments to register: "
+                             "{} and {}".format(name, function))
+        self._methods[name] = function
 
     def lookup(self, method):
         return self._methods[method]
