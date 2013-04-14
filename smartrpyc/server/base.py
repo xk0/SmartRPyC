@@ -27,50 +27,50 @@ class MethodsRegister(object):
         def my_method(request, arg1, arg2):
             pass
 
-        @methods.register('method2')
+        @methods.register(name='method2')
         def my_other_method(request, arg1=123, arg2=None):
             pass
+
+        methods.register(func=func, name='test')
 
         # then pass methods to the Server() constructor
     """
     def __init__(self):
         self._methods = {}
 
-    def register(self, name=None, func=None):
-        ## Use as plain decorator: @register
-        if name is None and func is None:
-            def decorator(func):
-                self._methods[func.__name__] = func
-                return func
-            return decorator
+    def register(self, func=None, name=None):
+        """
+        Refer to class docstring
 
-        ## Use as register(callable)
-        elif hasattr(name, '__call__'):
-            self._methods[name.__name__] = name
-            return name
+        :params func: Callable to register
+        :params name: Basestring to use as reference
+            name for `func`
+        """
 
-        ## Use as register(name, callable) or register(func=callable)
-        elif hasattr(func, '__call__'):
-            self._methods[name or func.__name__] = func
+        # If name is None we'll get the name from the
+        # function itself.
+        name = name or callable(func) and func.__name__
+
+        if not name and not callable(func):
+            # If we get here, most likely, the user has passed
+            # a non callable function. See unittest for a clearer
+            # example.
+            raise ValueError("Unsupported arguments to register: "
+                             "{} and {}".format(name, func))
+
+        def decorator(func):
+            self._methods[name] = func
             return func
 
-        ## Use as decorator: @register(name)
-        elif (name is not None) and (func is None):
-            def decorator(func):
-                self._methods[name] = func
-                return func
-            return decorator
-
-        ## Wrong use
-        raise ValueError(
-            "Unsupported arguments to register: {!r} and {!r}"
-            "".format(name, func))
+        # If func is not None, it means the method
+        # has been used either as a simple decorator
+        # or as a plain method. The function will be
+        # registered by calling decorator, otherwise,
+        # decorator will be returned.
+        return func and decorator(func) or decorator
 
     def lookup(self, method):
         return self._methods[method]
-
-    def __call__(self, *args, **kwargs):
-        return self.register(*args, **kwargs)
 
 
 class Request(object):
