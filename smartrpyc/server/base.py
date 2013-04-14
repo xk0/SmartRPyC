@@ -95,12 +95,10 @@ class Request(object):
 class Server(object):
     request_class = Request
 
-    def __init__(self, addresses, methods=None):
+    def __init__(self, methods=None):
         """
         Constructor for the RPC Server class
 
-        :param addresses:
-            A (list of) address(es) to which to bind the server.
         :param methods:
             Methods to be exposed via RPC. Usually a ``MethodsRegister``
             instance, but this is not mandatory.
@@ -112,7 +110,6 @@ class Server(object):
         if self.methods is None:
             self.methods = MethodsRegister()
 
-        self.bind(addresses)
         self.middleware = []  # Middleware chain
 
     @lazy_property
@@ -121,7 +118,13 @@ class Server(object):
         return context.socket(zmq.REP)
 
     def bind(self, addresses):
-        """Bind the server socket to an address (or a list of)"""
+        """
+        Bind the server socket to an address (or a list of)
+
+        :params addresses:
+            A (list of) address(es) to which to bind the server.
+        """
+        addresses = addresses or self.addresses
         if not isinstance(addresses, (list, tuple)):
             addresses = [addresses]
         for addr in addresses:

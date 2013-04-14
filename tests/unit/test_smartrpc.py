@@ -24,9 +24,11 @@ class ExampleRpcProcess(Process):
         self._middleware = middleware
 
     def run(self):
-        self.rpc = Server(self._addresses, self._methods)
+        self.rpc = Server(self._methods)
         if self._middleware is not None:
             self.rpc.middleware[:] = self._middleware[:]
+
+        self.rpc.bind(self._addresses)
         self.rpc.run()
 
 
