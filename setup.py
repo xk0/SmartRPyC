@@ -19,7 +19,7 @@ setup(
         'msgpack-python',
     ],
     # tests_require=['mock'],
-    test_suite='tests',
+    test_suite='smartrpyc.tests',
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
         'Development Status :: 4 - Beta',

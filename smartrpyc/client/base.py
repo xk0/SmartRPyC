@@ -60,7 +60,9 @@ class Client(object):
 
         packed = msgpack.packb(request, encoding='utf-8')
         self._socket.send(packed)
+        return request
 
+    def _get_response(self, request):
         response = msgpack.unpackb(self._socket.recv(), encoding='utf-8')
 
         response = self._exec_post_middleware(request, response)
@@ -77,7 +79,8 @@ class Client(object):
             raise AttributeError(item)
 
         def method_proxy(*a, **kw):
-            return self._do_request(item, a, kw)
+            request = self._do_request(item, a, kw)
+            return self._get_response(request)
 
         return method_proxy
 

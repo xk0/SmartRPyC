@@ -4,36 +4,17 @@ Tests for SmartRPC
 """
 
 import random
-import unittest
-from multiprocessing import Process
 
 import zmq
 import msgpack
 
-from smartrpyc import MethodsRegister, Server, Client, RemoteException
+from smartrpyc import Client, MethodsRegister, RemoteException
 from smartrpyc.utils import get_random_ipc_socket
-
-
-class ExampleRpcProcess(Process):
-    daemon = True
-
-    def __init__(self, methods, addresses=None, middleware=None):
-        super(ExampleRpcProcess, self).__init__()
-        self._methods = methods
-        self._addresses = addresses
-        self._middleware = middleware
-
-    def run(self):
-        self.rpc = Server(self._methods)
-        if self._middleware is not None:
-            self.rpc.middleware[:] = self._middleware[:]
-
-        self.rpc.bind(self._addresses)
-        self.rpc.run()
+from smartrpyc.tests import utils
 
 
 # noinspection PyUnusedLocal
-class SmartRPCTest(unittest.TestCase):
+class SmartRPCTest(utils.FunctionalTest):
     def setUp(self):
 
         methods = MethodsRegister()
@@ -67,11 +48,10 @@ class SmartRPCTest(unittest.TestCase):
             raise ValueError
 
         self.addr = get_random_ipc_socket()
-        self.rpc_process = ExampleRpcProcess(methods, self.addr)
-        self.rpc_process.start()
+        self.start_server(methods, self.addr)
 
     def tearDown(self):
-        self.rpc_process.terminate()
+        self.stop_server()
 
     def test_simple_call(self):
         context = zmq.Context()

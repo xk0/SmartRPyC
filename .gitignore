@@ -61,3 +61,4 @@ tramp
 
 # Project-specific
 /conf
+.venv
