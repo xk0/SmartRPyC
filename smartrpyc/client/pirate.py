@@ -5,7 +5,7 @@ from smartrpyc.client import base, exceptions
 
 
 class Lazy(base.Client):
-    def __init__(self, retries=3, timeout=3, **kwargs):
+    def __init__(self, retries=3, timeout=1000, **kwargs):
         self._retries = retries
         self._timeout = timeout
         super(Lazy, self).__init__(**kwargs)
