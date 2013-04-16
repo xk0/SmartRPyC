@@ -7,7 +7,7 @@ import zmq
 
 from smartrpyc.utils import lazy_property
 
-__all__ = ['Client', 'RemoteException']
+__all__ = ['Client', 'RemoteException', 'ClientMiddlewareBase']
 
 
 class RemoteException(Exception):
