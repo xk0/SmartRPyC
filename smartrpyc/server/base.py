@@ -9,7 +9,7 @@ import msgpack
 
 from smartrpyc.utils import lazy_property
 
-__all__ = ['MethodsRegister', 'Server', 'Request']
+__all__ = ['MethodsRegister', 'Server', 'Request', 'ServerMiddlewareBase']
 
 logger = logging.getLogger(__name__)
 
