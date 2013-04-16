@@ -35,7 +35,7 @@ From the sources folder::
 Usage
 =====
 
-...more coming soon, for now, have a look a the tests :)
+More documentation coming soon, for now, have a look a the tests :)
 
 
 Why not ZeroRPC?
@@ -48,7 +48,13 @@ things I wanted to improve over it:
   so I opted for improving the support for Python, by allowing things
   like keyword arguments.
 
-* **Simpler:** I didn't need some features offered by ZeroRPC
+* **Simpler:** I didn't need some features offered by ZeroRPC,
+  while I needed the ability to extend the library to add some other.
+
+* **Support middleware:** for things like authentication management,
+  it's way better to have the server/client handle what needed in
+  the background, than doing ugly things such as adding a "token"
+  argument to every call requiring authentication.
 
 * **Some bugfixes:** for example, we're not sharing the same ZeroRPC
   context for everything, as this would cause issues when running
