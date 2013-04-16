@@ -135,7 +135,6 @@ class Server(object):
         :params addresses:
             A (list of) address(es) to which to bind the server.
         """
-        addresses = addresses or self.addresses
         if not isinstance(addresses, (list, tuple)):
             addresses = [addresses]
         for addr in addresses:
@@ -157,7 +156,12 @@ class Server(object):
     def _process_request(self, request):
         """Process a received request"""
 
-        method = self.methods.lookup(request.method)
+        try:
+            method = self.methods.lookup(request.method)
+        except KeyError:
+            msg = 'No such method: {}'.format(request.method)
+            logger.error(msg)
+            return self._exception_message(msg)
 
         try:
             self._exec_pre_middleware(request, method)

@@ -186,3 +186,9 @@ class SmartRPCTest(utils.FunctionalTest):
 
         with self.assertRaises(RemoteException):
             client.raise_value_error()
+
+        ## Ok, the method doesn't exist, no big deal..
+        with self.assertRaises(RemoteException):
+            client.no_such_method()
+
+        client.method1()  # The server must still be alive here..
