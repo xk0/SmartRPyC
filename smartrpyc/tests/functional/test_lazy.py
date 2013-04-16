@@ -1,4 +1,4 @@
-from smartrpyc import MethodsRegister
+from smartrpyc.server import MethodsRegister
 from smartrpyc.client import pirate
 from smartrpyc.client import exceptions
 from smartrpyc.tests import utils

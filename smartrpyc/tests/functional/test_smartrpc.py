@@ -8,7 +8,8 @@ import random
 import zmq
 import msgpack
 
-from smartrpyc import Client, MethodsRegister, RemoteException
+from smartrpyc.client import Client, RemoteException
+from smartrpyc.server import MethodsRegister
 from smartrpyc.utils import get_random_ipc_socket
 from smartrpyc.tests import utils
 

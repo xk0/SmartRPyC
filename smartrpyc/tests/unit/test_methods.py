@@ -1,6 +1,6 @@
 import unittest
 
-from smartrpyc import MethodsRegister
+from smartrpyc.server import MethodsRegister
 
 
 class SmartRPCTest(unittest.TestCase):
