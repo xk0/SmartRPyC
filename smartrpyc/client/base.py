@@ -3,6 +3,7 @@ SmartRPC client
 """
 
 import msgpack
+import uuid
 import zmq
 
 from smartrpyc.utils import lazy_property
@@ -51,6 +52,7 @@ class Client(object):
 
     def _do_request(self, method, args, kwargs):
         request = self._prepare_request({
+            'i': str(uuid.uuid4()),
             'm': method,
             'a': args,
             'k': kwargs,

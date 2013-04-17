@@ -91,6 +91,10 @@ class Request(object):
         self.raw = raw
 
     @property
+    def id(self):
+        return self.raw["i"]
+
+    @property
     def method(self):
         return self.raw['m']
 
