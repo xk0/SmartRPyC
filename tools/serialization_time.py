@@ -5,12 +5,12 @@
 
 import timeit
 
-from smartrpyc.utils import serialization
-import msgpack
+from smartrpyc.utils.serialization import CustomMsgPackSerializer, \
+    MsgPackSerializer, JsonSerializer, PickleSerializer
 
 
-def run_test(module):
-    module.unpackb(module.packb({
+def run_test(packer):
+    packer.unpackb(packer.packb({
         'string': "This is a strijng",
         'unicode': u"This is a unicode",
         'None': None,
@@ -22,20 +22,29 @@ def run_test(module):
     }))
 
 
-def run_vanilla():
-    run_test(msgpack)
+def run_msgpack():
+    run_test(MsgPackSerializer)
 
 
-def run_custom():
-    run_test(serialization)
+def run_msgpack_custom():
+    run_test(CustomMsgPackSerializer)
+
+
+def run_json():
+    run_test(JsonSerializer)
+
+
+def run_pickle():
+    run_test(PickleSerializer)
 
 
 if __name__ == '__main__':
-    time1 = timeit.timeit(stmt='run_vanilla()',
-                          setup='from __main__ import run_vanilla',
-                          number=100000)
-    time2 = timeit.timeit(stmt='run_custom()',
-                          setup='from __main__ import run_custom',
-                          number=100000)
-    print time1
-    print time2
+    times = {}
+    funcs = ['msgpack', 'msgpack_custom', 'json', 'pickle']
+    for func_name in funcs:
+        times[func_name] = timeit.timeit(
+            stmt='run_{}()'.format(func_name),
+            setup='from __main__ import run_{}'.format(func_name),
+            number=10000)
+    for func_name in funcs:
+        print '{}: {}'.format(func_name, times[func_name])
