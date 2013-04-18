@@ -2,11 +2,11 @@
 SmartRPC client
 """
 
-import msgpack
 import uuid
 import zmq
 
 from smartrpyc.utils import lazy_property
+from smartrpyc.utils.serialization import MsgPackSerializer
 
 __all__ = ['Client', 'RemoteException', 'ClientMiddlewareBase']
 
@@ -38,6 +38,8 @@ class RemoteException(Exception):
 
 
 class Client(object):
+    packer = MsgPackSerializer
+
     def __init__(self, address=None):
         self._address = address
         self.middleware = []  # Middleware chain
@@ -60,12 +62,12 @@ class Client(object):
 
         request = self._exec_pre_middleware(request)
 
-        packed = msgpack.packb(request, encoding='utf-8')
+        packed = self.packer.packb(request)
         self._socket.send(packed)
         return request
 
     def _get_response(self, request):
-        response = msgpack.unpackb(self._socket.recv(), encoding='utf-8')
+        response = self.packer.unpackb(self._socket.recv())
 
         response = self._exec_post_middleware(request, response)
 

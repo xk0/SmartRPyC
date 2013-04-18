@@ -5,9 +5,9 @@ Base objects for the RPC
 import logging
 
 import zmq
-import msgpack
 
 from smartrpyc.utils import lazy_property
+from smartrpyc.utils.serialization import MsgPackSerializer
 
 __all__ = ['MethodsRegister', 'Server', 'Request', 'ServerMiddlewareBase']
 
@@ -109,6 +109,7 @@ class Request(object):
 
 class Server(object):
     request_class = Request
+    packer = MsgPackSerializer
 
     def __init__(self, methods=None):
         """
@@ -153,9 +154,9 @@ class Server(object):
         """Run once: process a request and send a response"""
         message_raw = self.socket.recv()
         message = self.request_class(
-            msgpack.unpackb(message_raw, encoding='utf-8'))
+            self.packer.unpackb(message_raw))
         response = self._process_request(message)
-        self.socket.send(msgpack.packb(response, encoding='utf-8'))
+        self.socket.send(self.packer.packb(response))
 
     def _process_request(self, request):
         """Process a received request"""
