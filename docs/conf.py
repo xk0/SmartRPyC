@@ -87,8 +87,36 @@ exclude_patterns = ['_build']
 # output. They are ignored by default.
 #show_authors = False
 
+# Customize colors..
+html_theme_options = {
+    'footerbgcolor': '#123A67',
+    'footertextcolor': '#888',
+
+    'sidebarbgcolor': "#2F77C9",
+    'sidebartextcolor': "#fff",
+    'sidebarlinkcolor': "#ddd",
+
+    'relbarbgcolor': '#134986',
+    'relbartextcolor': '#fff',
+    'relbarlinkcolor': '#eee',
+
+    'bgcolor': '#fff',
+    'textcolor': '#333',
+    'linkcolor': '#04c',
+    'visitedlinkcolor': '#04c',
+
+    'headbgcolor': '#f8f8f8',
+    'headtextcolor': '#123A67',
+    'headlinkcolor': '#04c',
+
+    'codebgcolor': '#111',
+    'codetextcolor': '#fff',
+}
+
+
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+#pygments_style = 'sphinx'
+pygments_style = 'monokai'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []

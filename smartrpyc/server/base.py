@@ -88,22 +88,29 @@ class Request(object):
     """Wrapper for requests from the RPC"""
 
     def __init__(self, raw):
+        """
+        :param raw: The (unpacked) content of the request
+        """
         self.raw = raw
 
     @property
     def id(self):
+        """Id of the request"""
         return self.raw["i"]
 
     @property
     def method(self):
+        """Name of the method to be called"""
         return self.raw['m']
 
     @property
     def args(self):
+        """Positional arguments for the called method"""
         return self.raw.get('a') or ()
 
     @property
     def kwargs(self):
+        """Keyword arguments for the called method"""
         return self.raw.get('k') or {}
 
 
