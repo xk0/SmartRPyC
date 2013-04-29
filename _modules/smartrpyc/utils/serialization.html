@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>smartrpyc.utils.serialization &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1-beta3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../../../index.html" />
+    <link rel="up" title="smartrpyc.utils" href="../utils.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../utils.html" accesskey="U">smartrpyc.utils</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for smartrpyc.utils.serialization</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Serialization utilities</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="kn">import</span> <span class="nn">msgpack</span>
+<span class="kn">from</span> <span class="nn">msgpack.fallback</span> <span class="kn">import</span> <span class="n">Unicode</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;MsgPackSerializer&#39;</span><span class="p">,</span> <span class="s">&#39;CustomMsgPackSerializer&#39;</span><span class="p">,</span> <span class="s">&#39;JsonSerializer&#39;</span><span class="p">,</span>
+           <span class="s">&#39;PickleSerializer&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="MsgPackSerializer"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.MsgPackSerializer">[docs]</a><span class="k">class</span> <span class="nc">MsgPackSerializer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MsgPackSerializer.packb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.MsgPackSerializer.packb">[docs]</a>    <span class="k">def</span> <span class="nf">packb</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MsgPackSerializer.unpackb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.MsgPackSerializer.unpackb">[docs]</a>    <span class="k">def</span> <span class="nf">unpackb</span><span class="p">(</span><span class="n">packed</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">packed</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="CustomMsgPackSerializer"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.CustomMsgPackSerializer">[docs]</a><span class="k">class</span> <span class="nc">CustomMsgPackSerializer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom msgpack serializer, allowing to differentiate between</span>
+<span class="sd">    strings and blobs. It&#39;s way more inefficient thant the MsgPackSerializer,</span>
+<span class="sd">    however, since it has to use the fallback Python-only version..</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="CustomMsgPackSerializer.packb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.CustomMsgPackSerializer.packb">[docs]</a>    <span class="k">def</span> <span class="nf">packb</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">_pack_strings</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+        <span class="c"># packer = CustomPacker()</span>
+        <span class="c"># return packer.pack(o)</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="CustomMsgPackSerializer.unpackb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.CustomMsgPackSerializer.unpackb">[docs]</a>    <span class="k">def</span> <span class="nf">unpackb</span><span class="p">(</span><span class="n">packed</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_unpack_strings</span><span class="p">(</span><span class="n">msgpack</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">packed</span><span class="p">))</span>
+        <span class="c"># unpacker = CustomUnpacker(None)</span>
+        <span class="c"># unpacker.feed(packed)</span>
+        <span class="c"># ret = unpacker._fb_unpack()</span>
+        <span class="c"># if unpacker._fb_got_extradata():</span>
+        <span class="c">#     raise ExtraData(ret, unpacker._fb_get_extradata())</span>
+        <span class="c"># return ret</span>
+
+</div></div>
+<span class="k">def</span> <span class="nf">_pack_strings</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Unicode</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;u&quot;</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;b&quot;</span> <span class="o">+</span> <span class="n">o</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">_pack_strings</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">_pack_strings</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">iteritems</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_pack_strings</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">o</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">o</span>
+
+
+<span class="k">def</span> <span class="nf">_unpack_strings</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;u&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;b&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Invalid string object prefix {}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">_unpack_strings</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">_unpack_strings</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">iteritems</span><span class="p">())</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_unpack_strings</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">o</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">o</span>
+
+
+<span class="c"># class CustomPacker(msgpack.fallback.Packer):</span>
+<span class="c">#     def _pack(self, obj, *args, **kwargs):</span>
+<span class="c">#</span>
+<span class="c">#         if isinstance(obj, Unicode):</span>
+<span class="c">#             obj = &quot;u&quot; + obj.encode(&#39;utf-8&#39;)</span>
+<span class="c">#</span>
+<span class="c">#         elif isinstance(obj, bytes):</span>
+<span class="c">#             obj = &quot;b&quot; + obj</span>
+<span class="c">#</span>
+<span class="c">#         return super(CustomPacker, self)._pack(obj, *args, **kwargs)</span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c"># class CustomUnpacker(msgpack.fallback.Unpacker):</span>
+<span class="c">#     def _fb_unpack(self, *args, **kwargs):</span>
+<span class="c">#         data = super(CustomUnpacker, self)._fb_unpack(*args, **kwargs)</span>
+<span class="c">#         if isinstance(data, bytes):</span>
+<span class="c">#             if data[0] == &#39;u&#39;:</span>
+<span class="c">#                 return data[1:].decode(&#39;utf-8&#39;)</span>
+<span class="c">#             elif data[0] == &#39;b&#39;:</span>
+<span class="c">#                 return data[1:]</span>
+<span class="c">#             raise ValueError(&quot;Invalid string object prefix {}!&quot;.format(data[0]))</span>
+<span class="c">#         return data</span>
+
+
+<div class="viewcode-block" id="JsonSerializer"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.JsonSerializer">[docs]</a><span class="k">class</span> <span class="nc">JsonSerializer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    .. warning::</span>
+<span class="sd">        We have a problem with blobs here, since all the strings</span>
+<span class="sd">        are automatically converted to unicode...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="JsonSerializer.packb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.JsonSerializer.packb">[docs]</a>    <span class="k">def</span> <span class="nf">packb</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="JsonSerializer.unpackb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.JsonSerializer.unpackb">[docs]</a>    <span class="k">def</span> <span class="nf">unpackb</span><span class="p">(</span><span class="n">packed</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">packed</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="PickleSerializer"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.PickleSerializer">[docs]</a><span class="k">class</span> <span class="nc">PickleSerializer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pickle-powered serializer</span>
+
+<span class="sd">    .. warning::</span>
+<span class="sd">        Never, ever, use this for untrusted data!! Big security risk!!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PickleSerializer.packb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.PickleSerializer.packb">[docs]</a>    <span class="k">def</span> <span class="nf">packb</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PickleSerializer.unpackb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.PickleSerializer.unpackb">[docs]</a>    <span class="k">def</span> <span class="nf">unpackb</span><span class="p">(</span><span class="n">packed</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">packed</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../utils.html" >smartrpyc.utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

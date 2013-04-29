@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Utilities &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-beta3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../index.html" />
+    <link rel="up" title="API Documentation" href="index.html" />
+    <link rel="prev" title="Server" href="server.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="server.html" title="Server"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">API Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="utilities">
+<h1>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h1>
+<p>This package contains miscellaneous utilities used by the library.</p>
+<div class="section" id="serializers">
+<h2>Serializers<a class="headerlink" href="#serializers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="smartrpyc.utils.serialization.MsgPackSerializer">
+<em class="property">class </em><tt class="descclassname">smartrpyc.utils.serialization.</tt><tt class="descname">MsgPackSerializer</tt><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#MsgPackSerializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.MsgPackSerializer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="staticmethod">
+<dt id="smartrpyc.utils.serialization.MsgPackSerializer.packb">
+<em class="property">static </em><tt class="descname">packb</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#MsgPackSerializer.packb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.MsgPackSerializer.packb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="smartrpyc.utils.serialization.MsgPackSerializer.unpackb">
+<em class="property">static </em><tt class="descname">unpackb</tt><big>(</big><em>packed</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#MsgPackSerializer.unpackb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.MsgPackSerializer.unpackb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="smartrpyc.utils.serialization.CustomMsgPackSerializer">
+<em class="property">class </em><tt class="descclassname">smartrpyc.utils.serialization.</tt><tt class="descname">CustomMsgPackSerializer</tt><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#CustomMsgPackSerializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.CustomMsgPackSerializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom msgpack serializer, allowing to differentiate between
+strings and blobs. It&#8217;s way more inefficient thant the MsgPackSerializer,
+however, since it has to use the fallback Python-only version..</p>
+<dl class="staticmethod">
+<dt id="smartrpyc.utils.serialization.CustomMsgPackSerializer.packb">
+<em class="property">static </em><tt class="descname">packb</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#CustomMsgPackSerializer.packb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.CustomMsgPackSerializer.packb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="smartrpyc.utils.serialization.CustomMsgPackSerializer.unpackb">
+<em class="property">static </em><tt class="descname">unpackb</tt><big>(</big><em>packed</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#CustomMsgPackSerializer.unpackb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.CustomMsgPackSerializer.unpackb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="smartrpyc.utils.serialization.JsonSerializer">
+<em class="property">class </em><tt class="descclassname">smartrpyc.utils.serialization.</tt><tt class="descname">JsonSerializer</tt><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#JsonSerializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.JsonSerializer" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">We have a problem with blobs here, since all the strings
+are automatically converted to unicode...</p>
+</div>
+<dl class="staticmethod">
+<dt id="smartrpyc.utils.serialization.JsonSerializer.packb">
+<em class="property">static </em><tt class="descname">packb</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#JsonSerializer.packb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.JsonSerializer.packb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="smartrpyc.utils.serialization.JsonSerializer.unpackb">
+<em class="property">static </em><tt class="descname">unpackb</tt><big>(</big><em>packed</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#JsonSerializer.unpackb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.JsonSerializer.unpackb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="smartrpyc.utils.serialization.PickleSerializer">
+<em class="property">class </em><tt class="descclassname">smartrpyc.utils.serialization.</tt><tt class="descname">PickleSerializer</tt><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#PickleSerializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.PickleSerializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pickle-powered serializer</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Never, ever, use this for untrusted data!! Big security risk!!</p>
+</div>
+<dl class="staticmethod">
+<dt id="smartrpyc.utils.serialization.PickleSerializer.packb">
+<em class="property">static </em><tt class="descname">packb</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#PickleSerializer.packb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.PickleSerializer.packb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="smartrpyc.utils.serialization.PickleSerializer.unpackb">
+<em class="property">static </em><tt class="descname">unpackb</tt><big>(</big><em>packed</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils/serialization.html#PickleSerializer.unpackb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.serialization.PickleSerializer.unpackb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="other-generic-utilities">
+<h2>Other generic utilities<a class="headerlink" href="#other-generic-utilities" title="Permalink to this headline">¶</a></h2>
+<p>Mostly used internally, but still worth documenting here</p>
+<dl class="function">
+<dt id="smartrpyc.utils.lazy_property">
+<tt class="descclassname">smartrpyc.utils.</tt><tt class="descname">lazy_property</tt><big>(</big><em>fn</em><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils.html#lazy_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.lazy_property" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="smartrpyc.utils.get_random_ipc_socket">
+<tt class="descclassname">smartrpyc.utils.</tt><tt class="descname">get_random_ipc_socket</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/smartrpyc/utils.html#get_random_ipc_socket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.utils.get_random_ipc_socket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Utilities</a><ul>
+<li><a class="reference internal" href="#serializers">Serializers</a></li>
+<li><a class="reference internal" href="#other-generic-utilities">Other generic utilities</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="server.html"
+                        title="previous chapter">Server</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/utils.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="server.html" title="Server"
+             >previous</a> |</li>
+        <li><a href="../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="index.html" >API Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
