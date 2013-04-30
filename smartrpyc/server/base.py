@@ -144,6 +144,7 @@ class Server(object):
         except SetMethod, e:
             logger.debug("A PRE middleware changed the method to be called")
             method = e.method
+            exception = None  # Clear exceptions happened before..
 
         except Exception, e:
             logger.exception('Exception during execution of PRE middleware')
@@ -151,6 +152,8 @@ class Server(object):
 
         ## If the method is still None, return the current exception
         if method is None:
+            if exception is None:
+                exception = KeyError("No such method")
             return self._exception_message(exception)
 
         ## Execute the method

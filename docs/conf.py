@@ -87,14 +87,16 @@ exclude_patterns = ['_build']
 # output. They are ignored by default.
 #show_authors = False
 
-# Customize colors..
+## Customize colors..
+## Note: we need to customize the CSS as those colors aren't enough..
+## eg. the code highlight background is still using default palette
 html_theme_options = {
-    'footerbgcolor': '#123A67',
+    'footerbgcolor': '#091D33',
     'footertextcolor': '#888',
 
-    'sidebarbgcolor': "#2F77C9",
+    'sidebarbgcolor': "#123A67",
     'sidebartextcolor': "#fff",
-    'sidebarlinkcolor': "#ddd",
+    'sidebarlinkcolor': "#80BBFF",
 
     'relbarbgcolor': '#134986',
     'relbartextcolor': '#fff',
@@ -102,21 +104,21 @@ html_theme_options = {
 
     'bgcolor': '#fff',
     'textcolor': '#333',
-    'linkcolor': '#04c',
-    'visitedlinkcolor': '#04c',
+    'linkcolor': '#2F77C9',
+    'visitedlinkcolor': '#2F77C9',
 
     'headbgcolor': '#f8f8f8',
     'headtextcolor': '#123A67',
     'headlinkcolor': '#04c',
 
-    'codebgcolor': '#111',
-    'codetextcolor': '#fff',
+#     'codebgcolor': '#111',
+#     'codetextcolor': '#fff',
 }
 
 
 # The name of the Pygments (syntax highlighting) style to use.
-#pygments_style = 'sphinx'
-pygments_style = 'monokai'
+pygments_style = 'sphinx'
+# pygments_style = 'monokai'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
@@ -290,4 +292,4 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+#intersphinx_mapping = {'http://docs.python.org/': None}

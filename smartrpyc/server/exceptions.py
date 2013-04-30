@@ -1,13 +1,14 @@
 """
-Exceptions for the server
+Exceptions used by the Server.
 """
 
-__all__ = ['DirectResponse']
+__all__ = ['DirectResponse', 'SetMethod']
 
 
 class DirectResponse(Exception):
     """
-    Used by middleware classes to directly send a response to the client.
+    Exception used by middleware to directly send a response to the client.
+
     Request processing will be terminated immediately and the response
     sent to the client, as a normal response.
     """
@@ -16,6 +17,11 @@ class DirectResponse(Exception):
 
 
 class SetMethod(Exception):
-    """Change the method to be called"""
+    """
+    Exception used by middleware to change the method to be executed.
+
+    As a side effect, this clears all the previous "method not found"
+    exceptions.
+    """
     def __init__(self, method):
         self.method = method

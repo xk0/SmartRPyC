@@ -1,5 +1,17 @@
 """
-Method Registers
+Method Registers module
+
+This module provides facilities for preparing a library of methods
+to be exposed via the RPC.
+
+The library creation can happen in several ways:
+
+* Using a :py:class:`.MethodsRegister` decorator, to register a bunch
+  of stand-alone functions
+* Usinng a :py:class:`.MethodsObject` to expose all the methods in a
+  given object (instance). This is especially useful if you need
+  to expose methods from an object **instance**, ie. you need to share
+  some state.
 """
 
 __all__ = ['MethodsRegisterBase', 'MethodsRegister', 'MethodsObject']
@@ -7,7 +19,10 @@ __all__ = ['MethodsRegisterBase', 'MethodsRegister', 'MethodsObject']
 
 class MethodsRegisterBase(object):
     """
-    Base for method register objects
+    Base for the Method Register objects.
+
+    This class provides an abstract of the methods that can (and should)
+    be exposed by a methods register object.
     """
 
     def register(self, func=None, name=None):
@@ -101,7 +116,10 @@ class MethodsRegister(MethodsRegisterBase):
 
 class MethodsObject(MethodsRegisterBase):
     """
-    Register that exposes all the methods from a passed object.
+    Objects wrapper register.
+
+    This is a "wrapper" register, that automatically exposes all the methods
+    contained in the object passed to the constructor.
     """
 
     _object = None
