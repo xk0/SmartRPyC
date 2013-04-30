@@ -1,5 +1,10 @@
 from setuptools import setup, find_packages
 
+## Hack: prevent gc from destroying some stuff before atexit
+## Needed to prevent annoying error message after test run
+# noinspection PyUnresolvedReferences
+from multiprocessing import util
+
 setup(
     name='SmartRPyC',
     version=__import__('smartrpyc').__version__,
