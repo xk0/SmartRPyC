@@ -8,84 +8,18 @@ import zmq
 
 from smartrpyc.utils import lazy_property
 from smartrpyc.utils.serialization import MsgPackSerializer
+from .register import MethodsRegister
+from .exceptions import DirectResponse, SetMethod
 
-__all__ = ['MethodsRegister', 'Server', 'Request', 'ServerMiddlewareBase']
+__all__ = ['Server', 'Request']
 
 logger = logging.getLogger(__name__)
 
 
-class MethodsRegister(object):
-    """
-    Register for methods to be exposed via RPC.
-    Mostly a wrapper around a dict.
-
-    Usage::
-
-        methods = MethodsRegister()
-
-        @methods.register
-        def my_method(request, arg1, arg2):
-            pass
-
-        @methods.register(name='method2')
-        def my_other_method(request, arg1=123, arg2=None):
-            pass
-
-        methods.register(func=func, name='test')
-
-        # then pass methods to the Server() constructor
-    """
-    def __init__(self):
-        self._methods = {}
-
-    def register(self, func=None, name=None):
-        """
-        Refer to class docstring
-
-        :params func: Callable to register
-        :params name: Basestring to use as reference
-            name for `func`
-        """
-
-        # If name is None we'll get the name from the
-        # function itself.
-        name = name or callable(func) and func.__name__
-
-        def decorator(func):
-            self.store(name, func)
-            return func
-
-        # If func is not None, it means the method
-        # has been used either as a simple decorator
-        # or as a plain method. The function will be
-        # registered by calling decorator, otherwise,
-        # decorator will be returned.
-        return func and decorator(func) or decorator
-
-    def store(self, name, function):
-        """
-        Method used to finally register a
-        function.
-
-        :params name:
-            Functions lookup name
-        :params function:
-            Callable function
-        """
-        if not isinstance(name, basestring) and not callable(function):
-            # If we get here, most likely, the user has passed
-            # a non callable function. See unittest for a clearer
-            # example.
-            raise ValueError("Unsupported arguments to register: "
-                             "{} and {}".format(name, function))
-        self._methods[name] = function
-
-    def lookup(self, method):
-        return self._methods[method]
-
-
 class Request(object):
     """Wrapper for requests from the RPC"""
+
+    server = None
 
     def __init__(self, raw):
         """
@@ -144,6 +78,9 @@ class Server(object):
         """
         Bind the server socket to an address (or a list of)
 
+        **Beware!** Only ``.bind()`` or ``.connect()`` may be called on
+        a given server instance!
+
         :params addresses:
             A (list of) address(es) to which to bind the server.
         """
@@ -151,6 +88,21 @@ class Server(object):
             addresses = [addresses]
         for addr in addresses:
             self.socket.bind(addr)
+
+    def connect(self, addresses):
+        """
+        Connect the server socket to an address (or a list of)
+
+        **Beware!** Only ``.bind()`` or ``.connect()`` may be called on
+        a given server instance!
+
+        :params addresses:
+            A (list of) address(es) to which to connect the server.
+        """
+        if not isinstance(addresses, (list, tuple)):
+            addresses = [addresses]
+        for addr in addresses:
+            self.socket.connect(addr)
 
     def run(self):
         """Start the server listening loop"""
@@ -160,27 +112,48 @@ class Server(object):
     def run_once(self):
         """Run once: process a request and send a response"""
         message_raw = self.socket.recv()
-        message = self.request_class(
-            self.packer.unpackb(message_raw))
-        response = self._process_request(message)
+        request = self.request_class(self.packer.unpackb(message_raw))
+        request.server = self
+        response = self._process_request(request)
         self.socket.send(self.packer.packb(response))
 
     def _process_request(self, request):
         """Process a received request"""
 
+        logger.debug("Processing request")
+
+        exception = None
+        method = None
+
+        ## Lookup the requested method
         try:
             method = self.methods.lookup(request.method)
         except KeyError:
             msg = 'No such method: {}'.format(request.method)
             logger.error(msg)
-            return self._exception_message(msg)
+            exception = KeyError(msg)
 
+        ## Execute all the PRE middleware on the request
         try:
             self._exec_pre_middleware(request, method)
+
+        except DirectResponse, e:
+            logger.debug("A PRE middleware requested to send a response now")
+            return self._response_message(e.response)
+
+        except SetMethod, e:
+            logger.debug("A PRE middleware changed the method to be called")
+            method = e.method
+
         except Exception, e:
             logger.exception('Exception during execution of PRE middleware')
             return self._exception_message(e)
 
+        ## If the method is still None, return the current exception
+        if method is None:
+            return self._exception_message(exception)
+
+        ## Execute the method
         try:
             response = method(request, *request.args, **request.kwargs)
         except Exception, e:
@@ -190,23 +163,33 @@ class Server(object):
         else:
             exception = None
 
+        ## Execute all the POST middleware on request + response
         try:
             response = self._exec_post_middleware(
                 request, method, response, exception)
+        except DirectResponse, e:
+            logger.info(
+                "A POST middleware requested immediate returning of a response")
+            return self._response_message(e.response)
         except Exception, e:
             logger.exception('Exception during execution of POST middleware')
             return self._exception_message(e)
 
+        ## If there was an exception, return it as a special message
         if exception is not None:
             return self._exception_message(exception)
-        else:
-            return {'r': response}
+
+        ## Return the response message
+        return self._response_message(response)
 
     def _exception_message(self, exception):
         return {
             'e': type(exception).__name__,
             'e_msg': str(exception),
         }
+
+    def _response_message(self, response):
+        return {'r': response}
 
     def _exec_pre_middleware(self, request, method):
         for mw in self.middleware:
@@ -220,17 +203,3 @@ class Server(object):
                 if retval is not None:
                     response = retval
         return response
-
-
-class ServerMiddlewareBase(object):
-    """
-    Base class for server middleware.
-    (mostly a reminder for methods signatures, subclassing from
-    this is not mandatory).
-    """
-
-    def pre(self, request, method):
-        pass
-
-    def post(self, request, method, response, exception):
-        pass
