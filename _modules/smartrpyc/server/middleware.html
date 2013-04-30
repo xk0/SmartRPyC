@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>smartrpyc.server.middleware &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1-beta3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for smartrpyc.server.middleware</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Server middleware</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">smartrpyc.server</span> <span class="kn">import</span> <span class="n">DirectResponse</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ServerMiddlewareBase&#39;</span><span class="p">,</span> <span class="s">&#39;IntrospectionMiddleware&#39;</span><span class="p">]</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ServerMiddlewareBase"><a class="viewcode-back" href="../../../api/server/middleware.html#smartrpyc.server.middleware.ServerMiddlewareBase">[docs]</a><span class="k">class</span> <span class="nc">ServerMiddlewareBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for the server middleware.</span>
+
+<span class="sd">    This is mostly a reminder for methods signatures, but subclassing</span>
+<span class="sd">    from this object is not mandatory for middleware classes, as long</span>
+<span class="sd">    as they expose a ``pre()`` and/or ``post()`` methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ServerMiddlewareBase.pre"><a class="viewcode-back" href="../../../api/server/middleware.html#smartrpyc.server.middleware.ServerMiddlewareBase.pre">[docs]</a>    <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method will be executed **before** the request is processed.</span>
+
+<span class="sd">        :param request:</span>
+<span class="sd">            a :py:class:`smartrpyc.server.Request` object</span>
+<span class="sd">        :param method:</span>
+<span class="sd">            the method that is going to be called to process the request</span>
+<span class="sd">            and generate the response</span>
+
+<span class="sd">        This method has different ways to hijack the request/response</span>
+<span class="sd">        process:</span>
+
+<span class="sd">        * Raise a :py:exc:`~smartrpyc.server.DirectResponse` exception,</span>
+<span class="sd">          containing some object to be directly returned to the client</span>
+
+<span class="sd">        * Raise a :py:exc:`~smartrpyc.server.SetMethod` exception,</span>
+<span class="sd">          containing an alternate method to be called</span>
+
+<span class="sd">        * Raise a generic exception that will terminate the request</span>
+<span class="sd">          processing and will be returned to the client directly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="ServerMiddlewareBase.post"><a class="viewcode-back" href="../../../api/server/middleware.html#smartrpyc.server.middleware.ServerMiddlewareBase.post">[docs]</a>    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method will be executed **after** the request is processed</span>
+<span class="sd">        and a response returned by the called method.</span>
+
+<span class="sd">        :param request:</span>
+<span class="sd">            a :py:class:`smartrpyc.server.Request` object</span>
+<span class="sd">        :param method:</span>
+<span class="sd">            the method that has been called to process the request</span>
+<span class="sd">            and generate the response</span>
+<span class="sd">        :param response:</span>
+<span class="sd">            the response object returned from the method call (if any)</span>
+<span class="sd">        :param exception:</span>
+<span class="sd">            the exception raised by the method call (if any)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+</div></div>
+<div class="viewcode-block" id="IntrospectionMiddleware"><a class="viewcode-back" href="../../../api/server/middleware.html#smartrpyc.server.middleware.IntrospectionMiddleware">[docs]</a><span class="k">class</span> <span class="nc">IntrospectionMiddleware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Middleware adding the ``.dir()`` and ``.doc()`` methods to be used</span>
+<span class="sd">    for introspecting the exposed methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IntrospectionMiddleware.pre"><a class="viewcode-back" href="../../../api/server/middleware.html#smartrpyc.server.middleware.IntrospectionMiddleware.pre">[docs]</a>    <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="c">## Note: this is experimental, method names may change!</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;dir&#39;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Called .dir() method&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">DirectResponse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">list_methods</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;doc&#39;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Called .doc() method for method {}&#39;</span>
+                         <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">_method</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="n">DirectResponse</span><span class="p">(</span><span class="n">_method</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

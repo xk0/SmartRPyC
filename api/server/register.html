@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>smartrpyc.server.register &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1-beta3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../../index.html" />
+    <link rel="up" title="smartrpyc.server" href="index.html" />
+    <link rel="next" title="smartrpyc.client" href="../client/index.html" />
+    <link rel="prev" title="smartrpyc.server.middleware" href="middleware.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../client/index.html" title="smartrpyc.client"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="middleware.html" title="smartrpyc.server.middleware"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">smartrpyc.server</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="smartrpyc-server-register">
+<h1>smartrpyc.server.register<a class="headerlink" href="#smartrpyc-server-register" title="Permalink to this headline">¶</a></h1>
+<p>This module provides facilities for preparing a library of methods
+to be exposed via the RPC.</p>
+<p>The library creation can happen in several ways:</p>
+<ul class="simple">
+<li>Using a <a class="reference internal" href="#smartrpyc.server.register.MethodsRegister" title="smartrpyc.server.register.MethodsRegister"><tt class="xref py py-class docutils literal"><span class="pre">MethodsRegister</span></tt></a> decorator, to register a bunch
+of stand-alone functions</li>
+<li>Usinng a <a class="reference internal" href="#smartrpyc.server.register.MethodsObject" title="smartrpyc.server.register.MethodsObject"><tt class="xref py py-class docutils literal"><span class="pre">MethodsObject</span></tt></a> to expose all the methods in a
+given object (instance). This is especially useful if you need
+to expose methods from an object <strong>instance</strong>, ie. you need to share
+some state.</li>
+</ul>
+<div class="section" id="base-for-the-method-register-objects">
+<h2>Base for the Method Register objects<a class="headerlink" href="#base-for-the-method-register-objects" title="Permalink to this headline">¶</a></h2>
+<p>This class provides an abstract of the methods that can (and should)
+be exposed by a methods register object.</p>
+<dl class="class">
+<dt id="smartrpyc.server.register.MethodsRegisterBase">
+<em class="property">class </em><tt class="descclassname">smartrpyc.server.register.</tt><tt class="descname">MethodsRegisterBase</tt><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegisterBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegisterBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base for the Method Register objects.</p>
+<p>This class provides an abstract of the methods that can (and should)
+be exposed by a methods register object.</p>
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsRegisterBase.list_methods">
+<tt class="descname">list_methods</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegisterBase.list_methods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegisterBase.list_methods" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all the supported methods</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsRegisterBase.lookup">
+<tt class="descname">lookup</tt><big>(</big><em>method</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegisterBase.lookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegisterBase.lookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>The most important method, returning the appropriate
+method to be called.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsRegisterBase.register">
+<tt class="descname">register</tt><big>(</big><em>func=None</em>, <em>name=None</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegisterBase.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegisterBase.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only used for registers supporting changes</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="methods-register">
+<h2>Methods register<a class="headerlink" href="#methods-register" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="smartrpyc.server.register.MethodsRegister">
+<em class="property">class </em><tt class="descclassname">smartrpyc.server.register.</tt><tt class="descname">MethodsRegister</tt><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegister"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegister" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register for methods to be exposed via RPC.
+Mostly a wrapper around a dict.</p>
+<p>Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">methods</span> <span class="o">=</span> <span class="n">MethodsRegister</span><span class="p">()</span>
+
+<span class="nd">@methods.register</span>
+<span class="k">def</span> <span class="nf">my_method</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="nd">@methods.register</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;method2&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_other_method</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">arg1</span><span class="o">=</span><span class="mi">123</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="n">methods</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;test&#39;</span><span class="p">)</span>
+
+<span class="c"># then pass methods to the Server() constructor</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsRegister.list_methods">
+<tt class="descname">list_methods</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegister.list_methods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegister.list_methods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsRegister.lookup">
+<tt class="descname">lookup</tt><big>(</big><em>method</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegister.lookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegister.lookup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsRegister.register">
+<tt class="descname">register</tt><big>(</big><em>func=None</em>, <em>name=None</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegister.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegister.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>Refer to class docstring</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Params func:</th><td class="field-body">Callable to register</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Params name:</th><td class="field-body">Basestring to use as reference
+name for <cite>func</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsRegister.store">
+<tt class="descname">store</tt><big>(</big><em>name</em>, <em>function</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsRegister.store"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsRegister.store" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method used to finally register a
+function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Params name:</th><td class="field-body">Functions lookup name</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Params function:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Callable function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="methods-object">
+<h2>Methods object<a class="headerlink" href="#methods-object" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I don&#8217;t like the name and I think I&#8217;ll change it soon.</p>
+</div>
+<dl class="class">
+<dt id="smartrpyc.server.register.MethodsObject">
+<em class="property">class </em><tt class="descclassname">smartrpyc.server.register.</tt><tt class="descname">MethodsObject</tt><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Objects wrapper register.</p>
+<p>This is a &#8220;wrapper&#8221; register, that automatically exposes all the methods
+contained in the object passed to the constructor.</p>
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsObject.list_methods">
+<tt class="descname">list_methods</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsObject.list_methods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsObject.list_methods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsObject.lookup">
+<tt class="descname">lookup</tt><big>(</big><em>method</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsObject.lookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsObject.lookup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.server.register.MethodsObject.set_object">
+<tt class="descname">set_object</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/register.html#MethodsObject.set_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.register.MethodsObject.set_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">smartrpyc.server.register</a><ul>
+<li><a class="reference internal" href="#base-for-the-method-register-objects">Base for the Method Register objects</a></li>
+<li><a class="reference internal" href="#methods-register">Methods register</a></li>
+<li><a class="reference internal" href="#methods-object">Methods object</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="middleware.html"
+                        title="previous chapter">smartrpyc.server.middleware</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../client/index.html"
+                        title="next chapter">smartrpyc.client</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/server/register.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../client/index.html" title="smartrpyc.client"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="middleware.html" title="smartrpyc.server.middleware"
+             >previous</a> |</li>
+        <li><a href="../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" >smartrpyc.server</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

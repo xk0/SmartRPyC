@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>smartrpyc.client.base &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1-beta3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../../index.html" />
+    <link rel="up" title="smartrpyc.client" href="index.html" />
+    <link rel="next" title="smartrpyc.client.exceptions" href="exceptions.html" />
+    <link rel="prev" title="smartrpyc.client" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="exceptions.html" title="smartrpyc.client.exceptions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="smartrpyc.client"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">smartrpyc.client</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="smartrpyc-client-base">
+<h1>smartrpyc.client.base<a class="headerlink" href="#smartrpyc-client-base" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-client-object">
+<h2>The Client object<a class="headerlink" href="#the-client-object" title="Permalink to this headline">¶</a></h2>
+<p>This is the main Client class.</p>
+<dl class="class">
+<dt id="smartrpyc.client.Client">
+<em class="property">class </em><tt class="descclassname">smartrpyc.client.</tt><tt class="descname">Client</tt><big>(</big><em>address=None</em><big>)</big><a class="headerlink" href="#smartrpyc.client.Client" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="smartrpyc.client.Client.packer">
+<tt class="descname">packer</tt><a class="headerlink" href="#smartrpyc.client.Client.packer" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">MsgPackSerializer</span></tt></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="exceptions-handling">
+<h2>Exceptions handling<a class="headerlink" href="#exceptions-handling" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">There is some work in progress here..</p>
+</div>
+<dl class="class">
+<dt id="smartrpyc.client.RemoteException">
+<em class="property">class </em><tt class="descclassname">smartrpyc.client.</tt><tt class="descname">RemoteException</tt><big>(</big><em>exc</em>, <em>msg</em><big>)</big><a class="headerlink" href="#smartrpyc.client.RemoteException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around a remote exception.
+Ideally, this should fake to be an instance of the remote
+exception too, but that&#8217;s not the case yet.. :(</p>
+<p>Eg:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">exc</span> <span class="o">=</span> <span class="n">RemoteException</span><span class="p">(</span><span class="s">&#39;ValueError&#39;</span><span class="p">,</span> <span class="s">&#39;Invalid value&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">RemoteException</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="client-middleware">
+<h2>Client Middleware<a class="headerlink" href="#client-middleware" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="smartrpyc.client.ClientMiddlewareBase">
+<em class="property">class </em><tt class="descclassname">smartrpyc.client.</tt><tt class="descname">ClientMiddlewareBase</tt><a class="headerlink" href="#smartrpyc.client.ClientMiddlewareBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for client middleware.
+(mostly a reminder for methods signatures, subclassing from
+this is not mandatory).</p>
+<dl class="method">
+<dt id="smartrpyc.client.ClientMiddlewareBase.post">
+<tt class="descname">post</tt><big>(</big><em>request</em>, <em>response</em><big>)</big><a class="headerlink" href="#smartrpyc.client.ClientMiddlewareBase.post" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.client.ClientMiddlewareBase.pre">
+<tt class="descname">pre</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#smartrpyc.client.ClientMiddlewareBase.pre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">smartrpyc.client.base</a><ul>
+<li><a class="reference internal" href="#the-client-object">The Client object</a></li>
+<li><a class="reference internal" href="#exceptions-handling">Exceptions handling</a></li>
+<li><a class="reference internal" href="#client-middleware">Client Middleware</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">smartrpyc.client</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="exceptions.html"
+                        title="next chapter">smartrpyc.client.exceptions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/client/base.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="exceptions.html" title="smartrpyc.client.exceptions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="smartrpyc.client"
+             >previous</a> |</li>
+        <li><a href="../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" >smartrpyc.client</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

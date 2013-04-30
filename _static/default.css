@@ -16,14 +16,14 @@
 body {
     font-family: sans-serif;
     font-size: 100%;
-    background-color: #123A67;
+    background-color: #091D33;
     color: #000;
     margin: 0;
     padding: 0;
 }
 
 div.document {
-    background-color: #2F77C9;
+    background-color: #123A67;
 }
 
 div.documentwrapper {
@@ -104,11 +104,11 @@ div.sphinxsidebar ul {
 }
 
 div.sphinxsidebar a {
-    color: #ddd;
+    color: #80BBFF;
 }
 
 div.sphinxsidebar input {
-    border: 1px solid #ddd;
+    border: 1px solid #80BBFF;
     font-family: sans-serif;
     font-size: 1em;
 }
@@ -118,12 +118,12 @@ div.sphinxsidebar input {
 /* -- hyperlink styles ------------------------------------------------------ */
 
 a {
-    color: #04c;
+    color: #2F77C9;
     text-decoration: none;
 }
 
 a:visited {
-    color: #04c;
+    color: #2F77C9;
     text-decoration: none;
 }
 
@@ -219,8 +219,8 @@ p.admonition-title:after {
 
 pre {
     padding: 5px;
-    background-color: #111;
-    color: #fff;
+    background-color: #eeffcc;
+    color: #333333;
     line-height: 120%;
     border: 1px solid #ac9;
     border-left: none;

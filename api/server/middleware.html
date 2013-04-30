@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>smartrpyc.server.middleware &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1-beta3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../../index.html" />
+    <link rel="up" title="smartrpyc.server" href="index.html" />
+    <link rel="next" title="smartrpyc.server.register" href="register.html" />
+    <link rel="prev" title="smartrpyc.server.exceptions" href="exceptions.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="register.html" title="smartrpyc.server.register"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="exceptions.html" title="smartrpyc.server.exceptions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">smartrpyc.server</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="smartrpyc-server-middleware">
+<h1>smartrpyc.server.middleware<a class="headerlink" href="#smartrpyc-server-middleware" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The middleware handling part needs some rethinking.</p>
+<ul class="last simple">
+<li>How do we decide whether to interrupt the request upon
+exception raising inside middleware?</li>
+<li>Do we want to execute the post middleware in any case, or just
+in case the request was processed in a clean way?<ul>
+<li>I think POST middleware should have a chance to know that an
+exception was raised and do something about it.</li>
+</ul>
+</li>
+<li>When should we use middleware and when would it be better to
+subclass Server instead?</li>
+</ul>
+</div>
+<div class="section" id="middleware-base">
+<h2>Middleware base<a class="headerlink" href="#middleware-base" title="Permalink to this headline">¶</a></h2>
+<p>Middleware can be used to extend the server functionality, by adding
+methods to be executed before and after the request is processed.</p>
+<dl class="class">
+<dt id="smartrpyc.server.middleware.ServerMiddlewareBase">
+<em class="property">class </em><tt class="descclassname">smartrpyc.server.middleware.</tt><tt class="descname">ServerMiddlewareBase</tt><a class="reference internal" href="../../_modules/smartrpyc/server/middleware.html#ServerMiddlewareBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.middleware.ServerMiddlewareBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for the server middleware.</p>
+<p>This is mostly a reminder for methods signatures, but subclassing
+from this object is not mandatory for middleware classes, as long
+as they expose a <tt class="docutils literal"><span class="pre">pre()</span></tt> and/or <tt class="docutils literal"><span class="pre">post()</span></tt> methods.</p>
+<dl class="method">
+<dt id="smartrpyc.server.middleware.ServerMiddlewareBase.post">
+<tt class="descname">post</tt><big>(</big><em>request</em>, <em>method</em>, <em>response</em>, <em>exception</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/middleware.html#ServerMiddlewareBase.post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.middleware.ServerMiddlewareBase.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will be executed <strong>after</strong> the request is processed
+and a response returned by the called method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>request</strong> &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">smartrpyc.server.Request</span></tt> object</li>
+<li><strong>method</strong> &#8211; the method that has been called to process the request
+and generate the response</li>
+<li><strong>response</strong> &#8211; the response object returned from the method call (if any)</li>
+<li><strong>exception</strong> &#8211; the exception raised by the method call (if any)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="smartrpyc.server.middleware.ServerMiddlewareBase.pre">
+<tt class="descname">pre</tt><big>(</big><em>request</em>, <em>method</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/middleware.html#ServerMiddlewareBase.pre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.middleware.ServerMiddlewareBase.pre" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will be executed <strong>before</strong> the request is processed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>request</strong> &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">smartrpyc.server.Request</span></tt> object</li>
+<li><strong>method</strong> &#8211; the method that is going to be called to process the request
+and generate the response</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This method has different ways to hijack the request/response
+process:</p>
+<ul class="simple">
+<li>Raise a <tt class="xref py py-exc docutils literal"><span class="pre">DirectResponse</span></tt> exception,
+containing some object to be directly returned to the client</li>
+<li>Raise a <tt class="xref py py-exc docutils literal"><span class="pre">SetMethod</span></tt> exception,
+containing an alternate method to be called</li>
+<li>Raise a generic exception that will terminate the request
+processing and will be returned to the client directly.</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="introspection-middleware">
+<h2>Introspection Middleware<a class="headerlink" href="#introspection-middleware" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="smartrpyc.server.middleware.IntrospectionMiddleware">
+<em class="property">class </em><tt class="descclassname">smartrpyc.server.middleware.</tt><tt class="descname">IntrospectionMiddleware</tt><a class="reference internal" href="../../_modules/smartrpyc/server/middleware.html#IntrospectionMiddleware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.middleware.IntrospectionMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd><p>Middleware adding the <tt class="docutils literal"><span class="pre">.dir()</span></tt> and <tt class="docutils literal"><span class="pre">.doc()</span></tt> methods to be used
+for introspecting the exposed methods.</p>
+<dl class="method">
+<dt id="smartrpyc.server.middleware.IntrospectionMiddleware.pre">
+<tt class="descname">pre</tt><big>(</big><em>request</em>, <em>method</em><big>)</big><a class="reference internal" href="../../_modules/smartrpyc/server/middleware.html#IntrospectionMiddleware.pre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#smartrpyc.server.middleware.IntrospectionMiddleware.pre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">smartrpyc.server.middleware</a><ul>
+<li><a class="reference internal" href="#middleware-base">Middleware base</a></li>
+<li><a class="reference internal" href="#introspection-middleware">Introspection Middleware</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="exceptions.html"
+                        title="previous chapter">smartrpyc.server.exceptions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="register.html"
+                        title="next chapter">smartrpyc.server.register</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/server/middleware.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="register.html" title="smartrpyc.server.register"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="exceptions.html" title="smartrpyc.server.exceptions"
+             >previous</a> |</li>
+        <li><a href="../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >API Documentation</a> &raquo;</li>
+          <li><a href="index.html" >smartrpyc.server</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

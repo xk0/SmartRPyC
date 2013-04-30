@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>smartrpyc.server.base &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1-beta3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for smartrpyc.server.base</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Base objects for the RPC</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">zmq</span>
+
+<span class="kn">from</span> <span class="nn">smartrpyc.utils</span> <span class="kn">import</span> <span class="n">lazy_property</span>
+<span class="kn">from</span> <span class="nn">smartrpyc.utils.serialization</span> <span class="kn">import</span> <span class="n">MsgPackSerializer</span>
+<span class="kn">from</span> <span class="nn">.register</span> <span class="kn">import</span> <span class="n">MethodsRegister</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">DirectResponse</span><span class="p">,</span> <span class="n">SetMethod</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Server&#39;</span><span class="p">,</span> <span class="s">&#39;Request&#39;</span><span class="p">]</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Request"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Request">[docs]</a><span class="k">class</span> <span class="nc">Request</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper for requests from the RPC&quot;&quot;&quot;</span>
+
+    <span class="n">server</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param raw: The (unpacked) content of the request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="n">raw</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Request.id"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Request.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Id of the request&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="p">[</span><span class="s">&quot;i&quot;</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Request.method"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Request.method">[docs]</a>    <span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Name of the method to be called&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="p">[</span><span class="s">&#39;m&#39;</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Request.args"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Request.args">[docs]</a>    <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Positional arguments for the called method&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Request.kwargs"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Request.kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Keyword arguments for the called method&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;k&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+
+</div></div>
+<div class="viewcode-block" id="Server"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server">[docs]</a><span class="k">class</span> <span class="nc">Server</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">request_class</span> <span class="o">=</span> <span class="n">Request</span>
+    <span class="n">packer</span> <span class="o">=</span> <span class="n">MsgPackSerializer</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the RPC Server class</span>
+
+<span class="sd">        :param methods:</span>
+<span class="sd">            Methods to be exposed via RPC. Usually a ``MethodsRegister``</span>
+<span class="sd">            instance, but this is not mandatory.</span>
+<span class="sd">            It has to have a ``lookup(name)`` method, returning</span>
+<span class="sd">            the specified method, or raising an exception if the method</span>
+<span class="sd">            was not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="o">=</span> <span class="n">methods</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="o">=</span> <span class="n">MethodsRegister</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">middleware</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># Middleware chain</span>
+
+    <span class="nd">@lazy_property</span>
+<div class="viewcode-block" id="Server.socket"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server.socket">[docs]</a>    <span class="k">def</span> <span class="nf">socket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">REP</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Server.bind"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addresses</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Bind the server socket to an address (or a list of)</span>
+
+<span class="sd">        **Beware!** Only ``.bind()`` or ``.connect()`` may be called on</span>
+<span class="sd">        a given server instance!</span>
+
+<span class="sd">        :params addresses:</span>
+<span class="sd">            A (list of) address(es) to which to bind the server.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">addresses</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">addresses</span> <span class="o">=</span> <span class="p">[</span><span class="n">addresses</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">addresses</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Server.connect"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addresses</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connect the server socket to an address (or a list of)</span>
+
+<span class="sd">        **Beware!** Only ``.bind()`` or ``.connect()`` may be called on</span>
+<span class="sd">        a given server instance!</span>
+
+<span class="sd">        :params addresses:</span>
+<span class="sd">            A (list of) address(es) to which to connect the server.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">addresses</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">addresses</span> <span class="o">=</span> <span class="p">[</span><span class="n">addresses</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">addresses</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Server.run"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start the server listening loop&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_once</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Server.run_once"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server.run_once">[docs]</a>    <span class="k">def</span> <span class="nf">run_once</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run once: process a request and send a response&quot;&quot;&quot;</span>
+        <span class="n">message_raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">packer</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">message_raw</span><span class="p">))</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">packer</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">_process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process a received request&quot;&quot;&quot;</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Processing request&quot;</span><span class="p">)</span>
+
+        <span class="n">exception</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c">## Lookup the requested method</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;No such method: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">exception</span> <span class="o">=</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c">## Execute all the PRE middleware on the request</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exec_pre_middleware</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">DirectResponse</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;A PRE middleware requested to send a response now&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response_message</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">SetMethod</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;A PRE middleware changed the method to be called&quot;</span><span class="p">)</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">method</span>
+            <span class="n">exception</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c"># Clear exceptions happened before..</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&#39;Exception during execution of PRE middleware&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception_message</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="c">## If the method is still None, return the current exception</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exception</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">exception</span> <span class="o">=</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;No such method&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception_message</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span>
+
+        <span class="c">## Execute the method</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">request</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&#39;Exception during execution of request&#39;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">exception</span> <span class="o">=</span> <span class="n">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exception</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c">## Execute all the POST middleware on request + response</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exec_post_middleware</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DirectResponse</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s">&quot;A POST middleware requested immediate returning of a response&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response_message</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&#39;Exception during execution of POST middleware&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception_message</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="c">## If there was an exception, return it as a special message</span>
+        <span class="k">if</span> <span class="n">exception</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception_message</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span>
+
+        <span class="c">## Return the response message</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response_message</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_exception_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">&#39;e&#39;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+            <span class="s">&#39;e_msg&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_response_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;r&#39;</span><span class="p">:</span> <span class="n">response</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_exec_pre_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">&#39;pre&#39;</span><span class="p">):</span>
+                <span class="n">mw</span><span class="o">.</span><span class="n">pre</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_exec_post_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">&#39;post&#39;</span><span class="p">):</span>
+                <span class="n">retval</span> <span class="o">=</span> <span class="n">mw</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">retval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">retval</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

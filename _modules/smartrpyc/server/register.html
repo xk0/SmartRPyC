@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>smartrpyc.server.register &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1-beta3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for smartrpyc.server.register</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Method Registers module</span>
+
+<span class="sd">This module provides facilities for preparing a library of methods</span>
+<span class="sd">to be exposed via the RPC.</span>
+
+<span class="sd">The library creation can happen in several ways:</span>
+
+<span class="sd">* Using a :py:class:`.MethodsRegister` decorator, to register a bunch</span>
+<span class="sd">  of stand-alone functions</span>
+<span class="sd">* Usinng a :py:class:`.MethodsObject` to expose all the methods in a</span>
+<span class="sd">  given object (instance). This is especially useful if you need</span>
+<span class="sd">  to expose methods from an object **instance**, ie. you need to share</span>
+<span class="sd">  some state.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;MethodsRegisterBase&#39;</span><span class="p">,</span> <span class="s">&#39;MethodsRegister&#39;</span><span class="p">,</span> <span class="s">&#39;MethodsObject&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="MethodsRegisterBase"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegisterBase">[docs]</a><span class="k">class</span> <span class="nc">MethodsRegisterBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base for the Method Register objects.</span>
+
+<span class="sd">    This class provides an abstract of the methods that can (and should)</span>
+<span class="sd">    be exposed by a methods register object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MethodsRegisterBase.register"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegisterBase.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Only used for registers supporting changes&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</div>
+<div class="viewcode-block" id="MethodsRegisterBase.lookup"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegisterBase.lookup">[docs]</a>    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The most important method, returning the appropriate</span>
+<span class="sd">        method to be called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</div>
+<div class="viewcode-block" id="MethodsRegisterBase.list_methods"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegisterBase.list_methods">[docs]</a>    <span class="k">def</span> <span class="nf">list_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List all the supported methods&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+</div></div>
+<div class="viewcode-block" id="MethodsRegister"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegister">[docs]</a><span class="k">class</span> <span class="nc">MethodsRegister</span><span class="p">(</span><span class="n">MethodsRegisterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Register for methods to be exposed via RPC.</span>
+<span class="sd">    Mostly a wrapper around a dict.</span>
+
+<span class="sd">    Usage::</span>
+
+<span class="sd">        methods = MethodsRegister()</span>
+
+<span class="sd">        @methods.register</span>
+<span class="sd">        def my_method(request, arg1, arg2):</span>
+<span class="sd">            pass</span>
+
+<span class="sd">        @methods.register(name=&#39;method2&#39;)</span>
+<span class="sd">        def my_other_method(request, arg1=123, arg2=None):</span>
+<span class="sd">            pass</span>
+
+<span class="sd">        methods.register(func=func, name=&#39;test&#39;)</span>
+
+<span class="sd">        # then pass methods to the Server() constructor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_methods</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="MethodsRegister.register"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegister.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Refer to class docstring</span>
+
+<span class="sd">        :params func: Callable to register</span>
+<span class="sd">        :params name: Basestring to use as reference</span>
+<span class="sd">            name for `func`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c"># If name is None we&#39;ll get the name from the</span>
+        <span class="c"># function itself.</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">and</span> <span class="n">func</span><span class="o">.</span><span class="n">__name__</span>
+
+        <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">func</span>
+
+        <span class="c"># If func is not None, it means the method</span>
+        <span class="c"># has been used either as a simple decorator</span>
+        <span class="c"># or as a plain method. The function will be</span>
+        <span class="c"># registered by calling decorator, otherwise,</span>
+        <span class="c"># decorator will be returned.</span>
+        <span class="k">return</span> <span class="n">func</span> <span class="ow">and</span> <span class="n">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">or</span> <span class="n">decorator</span>
+</div>
+<div class="viewcode-block" id="MethodsRegister.store"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegister.store">[docs]</a>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method used to finally register a</span>
+<span class="sd">        function.</span>
+
+<span class="sd">        :params name:</span>
+<span class="sd">            Functions lookup name</span>
+<span class="sd">        :params function:</span>
+<span class="sd">            Callable function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+            <span class="c"># If we get here, most likely, the user has passed</span>
+            <span class="c"># a non callable function. See unittest for a clearer</span>
+            <span class="c"># example.</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Unsupported arguments to register: &quot;</span>
+                             <span class="s">&quot;{} and {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">function</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_methods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">function</span>
+</div>
+<div class="viewcode-block" id="MethodsRegister.lookup"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegister.lookup">[docs]</a>    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_methods</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="MethodsRegister.list_methods"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsRegister.list_methods">[docs]</a>    <span class="k">def</span> <span class="nf">list_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_methods</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+</div></div>
+<div class="viewcode-block" id="MethodsObject"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsObject">[docs]</a><span class="k">class</span> <span class="nc">MethodsObject</span><span class="p">(</span><span class="n">MethodsRegisterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Objects wrapper register.</span>
+
+<span class="sd">    This is a &quot;wrapper&quot; register, that automatically exposes all the methods</span>
+<span class="sd">    contained in the object passed to the constructor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_object</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="MethodsObject.lookup"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsObject.lookup">[docs]</a>    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_object</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="MethodsObject.list_methods"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsObject.list_methods">[docs]</a>    <span class="k">def</span> <span class="nf">list_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_object</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)]</span>
+</div>
+<div class="viewcode-block" id="MethodsObject.set_object"><a class="viewcode-back" href="../../../api/server/register.html#smartrpyc.server.register.MethodsObject.set_object">[docs]</a>    <span class="k">def</span> <span class="nf">set_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&quot;You cannot set the object twice.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_object</span> <span class="o">=</span> <span class="n">obj</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

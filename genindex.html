@@ -33,6 +33,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="#" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,6 +52,7 @@
  <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
@@ -65,7 +69,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.Request.args">args (smartrpyc.server.Request attribute)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Request.args">args (smartrpyc.server.base.Request attribute)</a>
   </dt>
 
   </dl></td>
@@ -75,7 +79,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.Server.bind">bind() (smartrpyc.server.Server method)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server.bind">bind() (smartrpyc.server.base.Server method)</a>
   </dt>
 
   </dl></td>
@@ -85,17 +89,31 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/client.html#smartrpyc.client.Client">Client (class in smartrpyc.client)</a>
+  <dt><a href="api/client/base.html#smartrpyc.client.Client">Client (class in smartrpyc.client)</a>
   </dt>
 
       
-  <dt><a href="api/client.html#smartrpyc.client.ClientMiddlewareBase">ClientMiddlewareBase (class in smartrpyc.client)</a>
+  <dt><a href="api/client/base.html#smartrpyc.client.ClientMiddlewareBase">ClientMiddlewareBase (class in smartrpyc.client)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server.connect">connect() (smartrpyc.server.base.Server method)</a>
+  </dt>
+
+      
   <dt><a href="api/utils.html#smartrpyc.utils.serialization.CustomMsgPackSerializer">CustomMsgPackSerializer (class in smartrpyc.utils.serialization)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api/server/exceptions.html#smartrpyc.server.exceptions.DirectResponse">DirectResponse</a>
   </dt>
 
   </dl></td>
@@ -115,7 +133,13 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.Request.id">id (smartrpyc.server.Request attribute)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Request.id">id (smartrpyc.server.base.Request attribute)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api/server/middleware.html#smartrpyc.server.middleware.IntrospectionMiddleware">IntrospectionMiddleware (class in smartrpyc.server.middleware)</a>
   </dt>
 
   </dl></td>
@@ -135,7 +159,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.Request.kwargs">kwargs (smartrpyc.server.Request attribute)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Request.kwargs">kwargs (smartrpyc.server.base.Request attribute)</a>
   </dt>
 
   </dl></td>
@@ -145,15 +169,43 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api/client/pirate.html#smartrpyc.client.pirate.Lazy">Lazy (class in smartrpyc.client.pirate)</a>
+  </dt>
+
+      
   <dt><a href="api/utils.html#smartrpyc.utils.lazy_property">lazy_property() (in module smartrpyc.utils)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.MethodsRegister.lookup">lookup() (smartrpyc.server.MethodsRegister method)</a>
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsObject.list_methods">list_methods() (smartrpyc.server.register.MethodsObject method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegister.list_methods">(smartrpyc.server.register.MethodsRegister method)</a>
+  </dt>
+
+        
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegisterBase.list_methods">(smartrpyc.server.register.MethodsRegisterBase method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsObject.lookup">lookup() (smartrpyc.server.register.MethodsObject method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegister.lookup">(smartrpyc.server.register.MethodsRegister method)</a>
+  </dt>
+
+        
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegisterBase.lookup">(smartrpyc.server.register.MethodsRegisterBase method)</a>
+  </dt>
+
+      </dl></dd>
   </dl></td>
 </tr></table>
 
@@ -161,17 +213,25 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.Request.method">method (smartrpyc.server.Request attribute)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Request.method">method (smartrpyc.server.base.Request attribute)</a>
   </dt>
 
       
-  <dt><a href="api/server.html#smartrpyc.server.Server.methods">methods (smartrpyc.server.Server attribute)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server.methods">methods (smartrpyc.server.base.Server attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsObject">MethodsObject (class in smartrpyc.server.register)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.MethodsRegister">MethodsRegister (class in smartrpyc.server)</a>
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegister">MethodsRegister (class in smartrpyc.server.register)</a>
+  </dt>
+
+      
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegisterBase">MethodsRegisterBase (class in smartrpyc.server.register)</a>
   </dt>
 
       
@@ -203,12 +263,12 @@
 
       </dl></dd>
       
-  <dt><a href="api/client.html#smartrpyc.client.Client.packer">packer (smartrpyc.client.Client attribute)</a>
+  <dt><a href="api/client/base.html#smartrpyc.client.Client.packer">packer (smartrpyc.client.Client attribute)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="api/server.html#smartrpyc.server.Server.packer">(smartrpyc.server.Server attribute)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server.packer">(smartrpyc.server.base.Server attribute)</a>
   </dt>
 
       </dl></dd>
@@ -219,22 +279,26 @@
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/client.html#smartrpyc.client.ClientMiddlewareBase.post">post() (smartrpyc.client.ClientMiddlewareBase method)</a>
+  <dt><a href="api/client/base.html#smartrpyc.client.ClientMiddlewareBase.post">post() (smartrpyc.client.ClientMiddlewareBase method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="api/server.html#smartrpyc.server.ServerMiddlewareBase.post">(smartrpyc.server.ServerMiddlewareBase method)</a>
+  <dt><a href="api/server/middleware.html#smartrpyc.server.middleware.ServerMiddlewareBase.post">(smartrpyc.server.middleware.ServerMiddlewareBase method)</a>
   </dt>
 
       </dl></dd>
       
-  <dt><a href="api/client.html#smartrpyc.client.ClientMiddlewareBase.pre">pre() (smartrpyc.client.ClientMiddlewareBase method)</a>
+  <dt><a href="api/client/base.html#smartrpyc.client.ClientMiddlewareBase.pre">pre() (smartrpyc.client.ClientMiddlewareBase method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="api/server.html#smartrpyc.server.ServerMiddlewareBase.pre">(smartrpyc.server.ServerMiddlewareBase method)</a>
+  <dt><a href="api/server/middleware.html#smartrpyc.server.middleware.IntrospectionMiddleware.pre">(smartrpyc.server.middleware.IntrospectionMiddleware method)</a>
+  </dt>
+
+        
+  <dt><a href="api/server/middleware.html#smartrpyc.server.middleware.ServerMiddlewareBase.pre">(smartrpyc.server.middleware.ServerMiddlewareBase method)</a>
   </dt>
 
       </dl></dd>
@@ -245,29 +309,35 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.MethodsRegister.register">register() (smartrpyc.server.MethodsRegister method)</a>
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegister.register">register() (smartrpyc.server.register.MethodsRegister method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegisterBase.register">(smartrpyc.server.register.MethodsRegisterBase method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="api/client/base.html#smartrpyc.client.RemoteException">RemoteException (class in smartrpyc.client)</a>
   </dt>
 
       
-  <dt><a href="api/client.html#smartrpyc.client.RemoteException">RemoteException (class in smartrpyc.client)</a>
-  </dt>
-
-      
-  <dt><a href="api/server.html#smartrpyc.server.Request">Request (class in smartrpyc.server)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Request">Request (class in smartrpyc.server.base)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.Server.request_class">request_class (smartrpyc.server.Server attribute)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server.request_class">request_class (smartrpyc.server.base.Server attribute)</a>
   </dt>
 
       
-  <dt><a href="api/server.html#smartrpyc.server.Server.run">run() (smartrpyc.server.Server method)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server.run">run() (smartrpyc.server.base.Server method)</a>
   </dt>
 
       
-  <dt><a href="api/server.html#smartrpyc.server.Server.run_once">run_once() (smartrpyc.server.Server method)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server.run_once">run_once() (smartrpyc.server.base.Server method)</a>
   </dt>
 
   </dl></td>
@@ -277,21 +347,49 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.Server">Server (class in smartrpyc.server)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server">Server (class in smartrpyc.server.base)</a>
   </dt>
 
       
-  <dt><a href="api/server.html#smartrpyc.server.ServerMiddlewareBase">ServerMiddlewareBase (class in smartrpyc.server)</a>
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Request.server">server (smartrpyc.server.base.Request attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api/server/middleware.html#smartrpyc.server.middleware.ServerMiddlewareBase">ServerMiddlewareBase (class in smartrpyc.server.middleware)</a>
+  </dt>
+
+      
+  <dt><a href="api/client/exceptions.html#smartrpyc.client.exceptions.ServerUnavailable">ServerUnavailable</a>
+  </dt>
+
+      
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsObject.set_object">set_object() (smartrpyc.server.register.MethodsObject method)</a>
+  </dt>
+
+      
+  <dt><a href="api/server/exceptions.html#smartrpyc.server.exceptions.SetMethod">SetMethod</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api/server.html#smartrpyc.server.Server.socket">socket (smartrpyc.server.Server attribute)</a>, <a href="api/server.html#smartrpyc.server.Server.socket">[1]</a>
+  <dt><a href="api/client/exceptions.html#module-smartrpyc.client.exceptions">smartrpyc.client.exceptions (module)</a>
   </dt>
 
       
-  <dt><a href="api/server.html#smartrpyc.server.MethodsRegister.store">store() (smartrpyc.server.MethodsRegister method)</a>
+  <dt><a href="api/client/pirate.html#module-smartrpyc.client.pirate">smartrpyc.client.pirate (module)</a>
+  </dt>
+
+      
+  <dt><a href="api/server/exceptions.html#module-smartrpyc.server.exceptions">smartrpyc.server.exceptions (module)</a>
+  </dt>
+
+      
+  <dt><a href="api/server/base.html#smartrpyc.server.base.Server.socket">socket (smartrpyc.server.base.Server attribute)</a>, <a href="api/server/base.html#smartrpyc.server.base.Server.socket">[1]</a>
+  </dt>
+
+      
+  <dt><a href="api/server/register.html#smartrpyc.server.register.MethodsRegister.store">store() (smartrpyc.server.register.MethodsRegister method)</a>
   </dt>
 
   </dl></td>
@@ -354,6 +452,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="#" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li><a href="index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li> 
       </ul>
     </div>
