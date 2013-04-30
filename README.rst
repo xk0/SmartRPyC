@@ -10,6 +10,7 @@ A smart RPC library for Python, powered by ZeroMQ.
 :Author: Samuele Santi
 :Version: 0.1-beta
 :URL: https://github.com/xk0/SmartRPyC
+:Docs: http://xk0.github.io/SmartRPyC/
 
 
 Installing
