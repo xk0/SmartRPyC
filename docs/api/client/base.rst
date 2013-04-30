@@ -1,5 +1,5 @@
-Client
-######
+smartrpyc.client.base
+#####################
 
 .. py:currentmodule:: smartrpyc.client
 

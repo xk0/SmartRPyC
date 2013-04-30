@@ -1,7 +1,8 @@
-Server
-######
+smartrpyc.server.base
+#####################
 
-.. py:currentmodule:: smartrpyc.server
+.. py:currentmodule:: smartrpyc.server.base
+
 
 The Server object
 =================
@@ -39,35 +40,11 @@ This is the main Server class.
         The underlying ZeroMQ REP socket. Do not tamper with this.
 
 
-The methods register
-====================
-
-The methods register is basically a wrapped dictionary holding methods
-to be exposed via the RPC.
-
-.. note:: This thing is being refactored right now to make it more powerful..
-
-.. autoclass:: MethodsRegister
-    :members:
-    :undoc-members:
-
-
 The request object
 ==================
 
 The Request object holds information about the received request.
 
 .. autoclass:: Request
-    :members:
-    :undoc-members:
-
-
-Server Middleware
-=================
-
-Middleware can be used to extend the server functionality, by adding
-methods to be executed before and after the request is processed.
-
-.. autoclass:: ServerMiddlewareBase
     :members:
     :undoc-members:

@@ -8,7 +8,8 @@ import zmq
 from smartrpyc.utils import lazy_property
 from smartrpyc.utils.serialization import MsgPackSerializer
 
-__all__ = ['Client', 'RemoteException', 'ClientMiddlewareBase']
+__all__ = ['Client', 'IntrospectableClient', 'RemoteException',
+           'ClientMiddlewareBase']
 
 
 class RemoteException(Exception):
@@ -82,11 +83,23 @@ class Client(object):
         if item.startswith('_'):
             raise AttributeError(item)
 
-        def method_proxy(*a, **kw):
-            request = self._do_request(item, a, kw)
-            return self._get_response(request)
+        server = self
 
-        return method_proxy
+        class method_proxy(object):
+            def __call__(self, *a, **kw):
+                request = server._do_request(item, a, kw)
+                return server._get_response(request)
+
+            @lazy_property
+            def __doc__(self):
+                request = server._do_request('doc', (item,), {})
+                return server._get_response(request)
+
+        # def method_proxy(*a, **kw):
+        #     request = self._do_request(item, a, kw)
+        #     return self._get_response(request)
+
+        return method_proxy()
 
     def _exec_pre_middleware(self, request):
         for mw in self.middleware:
@@ -103,6 +116,13 @@ class Client(object):
                 if retval is not None:
                     response = retval
         return response
+
+
+class IntrospectableClient(Client):
+    def __dir__(self):
+        methods = dir(super(IntrospectableClient, self))
+        methods += self.dir()
+        return methods
 
 
 class ClientMiddlewareBase(object):
