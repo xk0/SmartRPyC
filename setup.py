@@ -27,5 +27,6 @@ setup(
         'Development Status :: 4 - Beta',
         'Topic :: Software Development :: Libraries',
         'Topic :: System :: Networking',
-    ]
+    ],
+    package_data={'': ['README.rst', 'LICENSE']},
 )
