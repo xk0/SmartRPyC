@@ -1,17 +1,28 @@
+##########
 SmartRPyC
-#########
+##########
 
-A smart RPC library for Python, powered by ZeroMQ.
+A small but powerful RPC library for Python, powered by ZeroMQ_.
 
-.. image:: https://travis-ci.org/xk0/SmartRPyC.png
-    :alt: Build status
-    :target: https://travis-ci.org/xk0/SmartRPyC
-
-:Author: Samuele Santi
 :Version: 0.1-beta5
-:URL: https://github.com/xk0/SmartRPyC
-:Docs: http://xk0.github.io/SmartRPyC/
+:Build status:
+    .. image:: https://travis-ci.org/xk0/SmartRPyC.png
+        :alt: Build status
+        :target: https://travis-ci.org/xk0/SmartRPyC
+:Authors:
+    * Samuele Santi
+    * Flavio Percoco
+:Links:
+    * `SmartRPyC GitHub pages`_
+    * `SmartRPyC source code`_
+    * `SmartRPyC documentation`_
+    * `SmartRPyC CheeseShop`_
 
+.. _ZeroMQ: http://www.zeromq.org/
+.. _SmartRPyC documentation: http://pythonhosted.org/SmartRPyC/
+.. _SmartRPyC GitHub pages: http://xk0.github.io/SmartRPyC/
+.. _SmartRPyC source code: https://github.com/xk0/SmartRPyC
+.. _SmartRPyC CheeseShop: https://pypi.python.org/pypi/SmartRPyC
 
 Installing
 ==========
@@ -20,17 +31,9 @@ To install it, just::
 
     pip install smartrpyc
 
-or::
+or, if you want the latest version from git::
 
     pip install git+git://github.com/xk0/SmartRPyC.git
-
-
-Testing
-=======
-
-From the sources folder::
-
-    python setup.py test
 
 
 Compatibility
@@ -41,15 +44,19 @@ The library has been test and is known to work on:
 * CPython 2.6
 * CPython 2.7
 * CPython 3.2
+* CPython 3.3
 
 **Note:** Python3 support is provided via 2to3 conversion, automatically
-handled by distribute on install. See the :ref:`Python 3` section below.
+handled by distribute on install. Everything should work just fine.
+
+**Note:** There currently are some problems with PyPy due to dependency
+on C extensions.
 
 
 Usage
 =====
 
-Have a look at the documentation here: http://xk0.github.io/SmartRPyC/
+Have a look at the `SmartRPyC documentation`_.
 
 
 Why not ZeroRPC?
@@ -77,26 +84,11 @@ things I wanted to improve over it:
 .. _dotCloud's ZeroRPC: http://zerorpc.dotcloud.com/
 
 
-Python 3
-========
+Testing
+=======
 
-We now support Python3 via 2to3 conversion (automatic, via distribute).
+From the sources folder::
 
-The thing has been tested on 3.2 (3.1 and 3.3 coming soon) and it works,
-however there are some problems with running the unittests:
+    python setup.py test
 
-If we run ``python setup.py test`` from the sources directory,
-everything gets built correctly in the ``build/lib`` directory,
-but the original ``smartrpyc`` package will still have precedence in the
-Python Path over the one in site-packages, and as such tests will fail.
 
-A solution to run the tests is to::
-
-  cd build/lib
-  python -m unittest discover -v smartrpyc.tests
-
-(btw, cd to whatever directory not containing a package named ``smartrpyc``
-would work..)
-
-We're now trying to figure out the correct way to make this happen
-when running on travis.. any suggestions welcome :)
