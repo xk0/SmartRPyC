@@ -8,6 +8,10 @@ from setuptools import setup, find_packages
 # noinspection PyUnresolvedReferences
 from multiprocessing import util
 
+version = __import__('smartrpyc').__version__
+if 'smartrpyc' in sys.modules:
+    del sys.modules['smartrpyc']
+
 install_requires = [
     'distribute',
     'pyzmq',
@@ -28,7 +32,7 @@ if sys.version_info <= (2, 7):
 
 setup(
     name='SmartRPyC',
-    version=__import__('smartrpyc').__version__,
+    version=version,
     packages=find_packages(),
     url='',
     license='Apache License, Version 2.0, January 2004',
