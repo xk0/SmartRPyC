@@ -1,4 +1,10 @@
-import unittest2 as unittest
+import sys
+
+if sys.version_info[0] < 3:
+    import unittest2 as unittest
+else:
+    import unittest
+
 from multiprocessing import Process
 
 from smartrpyc import server

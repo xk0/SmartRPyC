@@ -1,9 +1,16 @@
+## SmartRPyC setup.py
+
+import sys
 from setuptools import setup, find_packages
 
 ## Hack: prevent gc from destroying some stuff before atexit
 ## Needed to prevent annoying error message after test run
 # noinspection PyUnresolvedReferences
 from multiprocessing import util
+
+tests_require = ['cool_logging']
+if sys.version_info[0] < 3:
+    tests_require.append('unittest2')
 
 setup(
     name='SmartRPyC',
@@ -20,7 +27,7 @@ setup(
         'msgpack-python',
     ],
     # tests_require=['mock'],
-    tests_require=['cool_logging', 'unittest2'],
+    tests_require=tests_require,
     test_suite='smartrpyc.tests',
     classifiers=[
         'License :: OSI Approved :: Apache Software License',

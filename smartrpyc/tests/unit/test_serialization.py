@@ -2,7 +2,8 @@
 """
 Tests for serialization
 """
-import unittest2 as unittest
+
+from smartrpyc.tests.utils import unittest
 
 
 class SerializationTestCase(unittest.TestCase):

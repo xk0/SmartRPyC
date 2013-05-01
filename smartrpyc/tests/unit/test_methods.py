@@ -1,4 +1,4 @@
-import unittest2 as unittest
+from smartrpyc.tests.utils import unittest
 
 from smartrpyc.server import MethodsRegister
 
