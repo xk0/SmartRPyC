@@ -39,9 +39,9 @@ class CustomMsgPackSerializer(object):
 
 def _pack_strings(o):
     if isinstance(o, Unicode):
-        return "u" + o.encode('utf-8')
+        return b"u" + o.encode('utf-8')
     elif isinstance(o, bytes):
-        return "b" + o
+        return b"b" + o
     elif isinstance(o, dict):
         return dict(
             (_pack_strings(k), _pack_strings(v))
@@ -54,9 +54,9 @@ def _pack_strings(o):
 
 def _unpack_strings(o):
     if isinstance(o, bytes):
-        if o[0] == 'u':
+        if o[0] in (b'u', ord(b'u')):
             return o[1:].decode('utf-8')
-        elif o[0] == 'b':
+        elif o[0] in (b'b', ord(b'b')):
             return o[1:]
         raise ValueError("Invalid string object prefix {0}!".format(o[0]))
     elif isinstance(o, dict):

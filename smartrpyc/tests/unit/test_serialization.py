@@ -26,7 +26,7 @@ class SerializationTestCase(unittest.TestCase):
                 'ok, we can even do this': [
                     u"Hello, world!",
                     u"Hëllö, wørlḋ",
-                    ['Hello', b'world'],
+                    ['Hello', 'world'],
                 ],
                 u"And this??": {'yay': 'hello'},
                 u"øf cøürsë, wé cán..": True,
