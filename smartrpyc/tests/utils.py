@@ -1,6 +1,8 @@
 import sys
 from multiprocessing import Process
 
+## For Python < 2.7, we need to use unittest2 that contains
+## backported functionality introduced only in 2.7
 if sys.version_info <= (2, 7):
     try:
         import unittest2 as unittest
@@ -13,7 +15,6 @@ from smartrpyc import server
 
 
 class ExampleRpcProcess(Process):
-    _daemonic = True
 
     def __init__(self, methods, addresses=None, middleware=None):
         super(ExampleRpcProcess, self).__init__()
@@ -34,6 +35,7 @@ class FunctionalTest(unittest.TestCase):
 
     def start_server(self, methods, addresses):
         self.rpc_process = ExampleRpcProcess(methods, addresses)
+        self.rpc_process.daemon = True
         self.rpc_process.start()
         return self.rpc_process
 
