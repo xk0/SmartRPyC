@@ -72,7 +72,7 @@ class IntrospectionMiddleware(object):
             logger.debug('Called .dir() method')
             raise DirectResponse(request.server.methods.list_methods())
         if request.method == 'doc':
-            logger.debug('Called .doc() method for method {}'
+            logger.debug('Called .doc() method for method {0}'
                          ''.format(request.args[0]))
             _method = request.server.methods.lookup(request.args[0])
             raise DirectResponse(_method.__doc__)
