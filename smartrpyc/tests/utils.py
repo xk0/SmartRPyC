@@ -1,4 +1,4 @@
-import unittest
+import unittest2 as unittest
 from multiprocessing import Process
 
 from smartrpyc import server

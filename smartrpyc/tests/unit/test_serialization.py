@@ -2,7 +2,7 @@
 """
 Tests for serialization
 """
-import unittest
+import unittest2 as unittest
 
 
 class SerializationTestCase(unittest.TestCase):

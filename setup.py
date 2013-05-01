@@ -20,7 +20,7 @@ setup(
         'msgpack-python',
     ],
     # tests_require=['mock'],
-    tests_require=['cool_logging'],
+    tests_require=['cool_logging', 'unittest2'],
     test_suite='smartrpyc.tests',
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
