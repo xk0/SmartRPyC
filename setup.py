@@ -8,8 +8,22 @@ from setuptools import setup, find_packages
 # noinspection PyUnresolvedReferences
 from multiprocessing import util
 
+install_requires = [
+    'distribute',
+    'pyzmq',
+    'msgpack-python',
+]
+
 tests_require = ['cool_logging']
-if sys.version_info[0] < 3:
+
+extra = {}
+if sys.version_info >= (3,):
+    extra['use_2to3'] = True
+    #extra['convert_2to3_doctests'] = ['src/your/module/README.txt']
+    #extra['use_2to3_fixers'] = ['your.fixers']
+
+if sys.version_info <= (2, 7):
+    ## We need unittest2 for Python < 2.7
     tests_require.append('unittest2')
 
 setup(
@@ -22,11 +36,7 @@ setup(
     author_email='samuele@samuelesanti.com - flaper87@flaper87.org',
     description='SmartRPyC is a ZeroMQ-based RPC library for Python',
     long_description='SmartRPyC is a ZeroMQ-based RPC library for Python',
-    install_requires=[
-        'pyzmq',
-        'msgpack-python',
-    ],
-    # tests_require=['mock'],
+    install_requires=install_requires,
     tests_require=tests_require,
     test_suite='smartrpyc.tests',
     classifiers=[
@@ -36,4 +46,5 @@ setup(
         'Topic :: System :: Networking',
     ],
     package_data={'': ['README.rst', 'LICENSE']},
+    **extra
 )

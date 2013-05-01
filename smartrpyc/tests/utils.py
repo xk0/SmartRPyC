@@ -1,17 +1,19 @@
 import sys
+from multiprocessing import Process
 
-if sys.version_info[0] < 3:
-    import unittest2 as unittest
+if sys.version_info <= (2, 7):
+    try:
+        import unittest2 as unittest
+    except ImportError:
+        import unittest
 else:
     import unittest
-
-from multiprocessing import Process
 
 from smartrpyc import server
 
 
 class ExampleRpcProcess(Process):
-    daemon = True
+    _daemonic = True
 
     def __init__(self, methods, addresses=None, middleware=None):
         super(ExampleRpcProcess, self).__init__()
@@ -37,3 +39,4 @@ class FunctionalTest(unittest.TestCase):
 
     def stop_server(self):
         self.rpc_process.terminate()
+        self.rpc_process.join(timeout=3)
