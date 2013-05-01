@@ -8,7 +8,7 @@ A smart RPC library for Python, powered by ZeroMQ.
     :target: https://travis-ci.org/xk0/SmartRPyC
 
 :Author: Samuele Santi
-:Version: 0.1-beta4
+:Version: 0.1-beta5
 :URL: https://github.com/xk0/SmartRPyC
 :Docs: http://xk0.github.io/SmartRPyC/
 
