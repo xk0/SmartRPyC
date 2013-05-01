@@ -40,10 +40,12 @@ setup(
     tests_require=tests_require,
     test_suite='smartrpyc.tests',
     classifiers=[
-        'License :: OSI Approved :: Apache Software License',
-        'Development Status :: 4 - Beta',
-        'Topic :: Software Development :: Libraries',
-        'Topic :: System :: Networking',
+        "License :: OSI Approved :: Apache Software License",
+        "Development Status :: 4 - Beta",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: System :: Networking",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
     ],
     package_data={'': ['README.rst', 'LICENSE']},
     **extra
