@@ -104,7 +104,7 @@ class MethodsRegister(MethodsRegisterBase):
             # a non callable function. See unittest for a clearer
             # example.
             raise ValueError("Unsupported arguments to register: "
-                             "{} and {}".format(name, function))
+                             "{0} and {1}".format(name, function))
         self._methods[name] = function
 
     def lookup(self, method):

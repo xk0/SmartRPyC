@@ -31,18 +31,10 @@ class CustomMsgPackSerializer(object):
     @staticmethod
     def packb(o):
         return msgpack.packb(_pack_strings(o))
-        # packer = CustomPacker()
-        # return packer.pack(o)
 
     @staticmethod
     def unpackb(packed):
         return _unpack_strings(msgpack.unpackb(packed))
-        # unpacker = CustomUnpacker(None)
-        # unpacker.feed(packed)
-        # ret = unpacker._fb_unpack()
-        # if unpacker._fb_got_extradata():
-        #     raise ExtraData(ret, unpacker._fb_get_extradata())
-        # return ret
 
 
 def _pack_strings(o):
@@ -66,7 +58,7 @@ def _unpack_strings(o):
             return o[1:].decode('utf-8')
         elif o[0] == 'b':
             return o[1:]
-        raise ValueError("Invalid string object prefix {}!".format(o[0]))
+        raise ValueError("Invalid string object prefix {0}!".format(o[0]))
     elif isinstance(o, dict):
         return dict(
             (_unpack_strings(k), _unpack_strings(v))
@@ -75,30 +67,6 @@ def _unpack_strings(o):
         return [_unpack_strings(x) for x in o]
     else:
         return o
-
-
-# class CustomPacker(msgpack.fallback.Packer):
-#     def _pack(self, obj, *args, **kwargs):
-#
-#         if isinstance(obj, Unicode):
-#             obj = "u" + obj.encode('utf-8')
-#
-#         elif isinstance(obj, bytes):
-#             obj = "b" + obj
-#
-#         return super(CustomPacker, self)._pack(obj, *args, **kwargs)
-#
-#
-# class CustomUnpacker(msgpack.fallback.Unpacker):
-#     def _fb_unpack(self, *args, **kwargs):
-#         data = super(CustomUnpacker, self)._fb_unpack(*args, **kwargs)
-#         if isinstance(data, bytes):
-#             if data[0] == 'u':
-#                 return data[1:].decode('utf-8')
-#             elif data[0] == 'b':
-#                 return data[1:]
-#             raise ValueError("Invalid string object prefix {}!".format(data[0]))
-#         return data
 
 
 class JsonSerializer(object):

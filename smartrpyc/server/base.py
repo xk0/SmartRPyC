@@ -129,7 +129,7 @@ class Server(object):
         try:
             method = self.methods.lookup(request.method)
         except KeyError:
-            msg = 'No such method: {}'.format(request.method)
+            msg = 'No such method: {0}'.format(request.method)
             logger.error(msg)
             exception = KeyError(msg)
 

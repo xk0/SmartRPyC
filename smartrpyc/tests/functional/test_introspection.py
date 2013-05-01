@@ -31,7 +31,7 @@ class TestIntrospection(utils.FunctionalTest):
 
         def method2(request, name):
             """Docstring of method2()"""
-            return u"Hello, {}!".format(name)
+            return u"Hello, {0}!".format(name)
 
         def method3(request, greeting=u'Hello', name=u'world'):
             """Docstring of method3()"""
@@ -39,7 +39,7 @@ class TestIntrospection(utils.FunctionalTest):
                 raise ValueError("Greeting must be a string")
             if not isinstance(name, basestring):
                 raise ValueError("Name must be a string")
-            return u"{}, {}!".format(greeting, name)
+            return u"{0}, {1}!".format(greeting, name)
 
         methods.register(method1)
         methods.register(method2)

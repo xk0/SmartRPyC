@@ -24,4 +24,4 @@ def get_random_ipc_socket():
     import tempfile, os
     with tempfile.NamedTemporaryFile(delete=False, suffix='.sock') as s:
         os.unlink(s.name)
-    return 'ipc://{}'.format(s.name)
+    return 'ipc://{0}'.format(s.name)

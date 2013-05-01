@@ -26,7 +26,7 @@ class SmartRPCTest(utils.FunctionalTest):
 
         @methods.register
         def method2(request, name):
-            return u"Hello, {}!".format(name)
+            return u"Hello, {0}!".format(name)
 
         @methods.register
         def method3(request, greeting=u'Hello', name=u'world'):
@@ -34,7 +34,7 @@ class SmartRPCTest(utils.FunctionalTest):
                 raise ValueError("Greeting must be a string")
             if not isinstance(name, basestring):
                 raise ValueError("Name must be a string")
-            return u"{}, {}!".format(greeting, name)
+            return u"{0}, {1}!".format(greeting, name)
 
         @methods.register
         def get_list(request):
@@ -78,14 +78,14 @@ class SmartRPCTest(utils.FunctionalTest):
         for i in socket_ids:
             sockets[i].send(msgpack.packb({
                 'm': 'method2',
-                'a': ['socket {}'.format(i)],
+                'a': ['socket {0}'.format(i)],
             }, encoding='utf-8'))
 
         random.shuffle(socket_ids)
         for i in socket_ids:
             response = msgpack.unpackb(sockets[i].recv(), encoding='utf-8')
             self.assertDictEqual(
-                {'r': 'Hello, socket {}!'.format(i)},
+                {'r': 'Hello, socket {0}!'.format(i)},
                 response)
 
     def test_call_with_args(self):

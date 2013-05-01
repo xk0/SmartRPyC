@@ -32,10 +32,10 @@ class RemoteException(Exception):
         self.original_exc = exc
 
     def __str__(self):
-        return "{}: {}".format(self.original_exc, self.message)
+        return "{0}: {1}".format(self.original_exc, self.message)
 
     def __repr__(self):
-        return "<RemoteException: {!r}>".format(str(self))
+        return "<RemoteException: {0!r}>".format(str(self))
 
 
 class Client(object):
