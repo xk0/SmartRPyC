@@ -3,10 +3,17 @@
 ROOTDIR="$( dirname "$BASH_SOURCE" )/.."
 cd "$ROOTDIR"
 
+if which unit2 &>/dev/null; then
+    UNITTEST=unit2
+else
+    UNITTEST="python -m unittest"
+fi
+
+
 if [ $# == 0 ]; then
 
     ## Discover & run all the tests
-    unit2 discover -v
+    $UNITTEST discover -v
 
 else
 
@@ -17,6 +24,6 @@ else
     fi
 
     ## Run the selected tests
-    unit2 -v "$@"
+    $UNITTEST -v "$@"
 
 fi
