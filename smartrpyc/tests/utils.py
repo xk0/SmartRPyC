@@ -2,11 +2,12 @@
 Utilities for unittests
 """
 
-import multiprocessing
+# import multiprocessing
+import threading
 from smartrpyc import server
 
 
-class ExampleRpcProcess(multiprocessing.Process):
+class ExampleRpcProcess(threading.Thread):
     """Process running a SmartRPyC server"""
 
     def __init__(self, methods, addresses=None, middleware=None):
@@ -40,5 +41,7 @@ class TestingServer(object):
         return self.rpc_process
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.rpc_process.terminate()
-        self.rpc_process.join(timeout=3)
+        # self.rpc_process.terminate()
+        # self.rpc_process.join(timeout=3)
+        ## the thread should terminate when going out of scope..
+        pass

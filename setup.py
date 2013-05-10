@@ -4,11 +4,6 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-## Hack: prevent gc from destroying some stuff before atexit
-## Needed to prevent annoying error message after test run
-# noinspection PyUnresolvedReferences
-from multiprocessing import util
-
 version = __import__('smartrpyc').__version__
 if 'smartrpyc' in sys.modules:
     del sys.modules['smartrpyc']
