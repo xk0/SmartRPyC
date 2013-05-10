@@ -1,20 +1,13 @@
-import sys
-from multiprocessing import Process
+"""
+Utilities for unittests
+"""
 
-## For Python < 2.7, we need to use unittest2 that contains
-## backported functionality introduced only in 2.7
-if sys.version_info <= (2, 7):
-    try:
-        import unittest2 as unittest
-    except ImportError:
-        import unittest
-else:
-    import unittest
-
+import multiprocessing
 from smartrpyc import server
 
 
-class ExampleRpcProcess(Process):
+class ExampleRpcProcess(multiprocessing.Process):
+    """Process running a SmartRPyC server"""
 
     def __init__(self, methods, addresses=None, middleware=None):
         super(ExampleRpcProcess, self).__init__()
@@ -31,14 +24,21 @@ class ExampleRpcProcess(Process):
         self.rpc.run()
 
 
-class FunctionalTest(unittest.TestCase):
+class TestingServer(object):
+    """Context manager to provide a server"""
 
-    def start_server(self, methods, addresses):
-        self.rpc_process = ExampleRpcProcess(methods, addresses)
+    def __init__(self, methods, addresses, middleware=None):
+        self.methods = methods
+        self.addresses = addresses
+        self.middleware = middleware
+
+    def __enter__(self):
+        self.rpc_process = ExampleRpcProcess(
+            self.methods, self.addresses, middleware=self.middleware)
         self.rpc_process.daemon = True
         self.rpc_process.start()
         return self.rpc_process
 
-    def stop_server(self):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         self.rpc_process.terminate()
         self.rpc_process.join(timeout=3)

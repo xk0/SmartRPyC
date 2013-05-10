@@ -1,9 +1,10 @@
-from smartrpyc.tests.utils import unittest
+# from smartrpyc.tests.utils import unittest
 
+import pytest
 from smartrpyc.server import MethodsRegister
 
 
-class SmartRPCTest(unittest.TestCase):
+class TestMethodsRegister(object):
 
     def test_registration(self):
         register = MethodsRegister()
@@ -12,12 +13,12 @@ class SmartRPCTest(unittest.TestCase):
         register.register(func)
         register.register(name="test-x")(func)
         register.register(func, name="test-y")
-        self.assertEqual(register.lookup("<lambda>"), func)
-        self.assertEqual(register.lookup("test-x"), func)
-        self.assertEqual(register.lookup("test-y"), func)
+        assert register.lookup("<lambda>") == func
+        assert register.lookup("test-x") == func
+        assert register.lookup("test-y") == func
 
     def test_no_callable(self):
         register = MethodsRegister()
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             register.register("not_callable")
             register.register("not_callable", "test")

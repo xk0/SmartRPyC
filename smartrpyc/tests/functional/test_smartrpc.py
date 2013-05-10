@@ -7,6 +7,7 @@ import random
 
 import zmq
 import msgpack
+import pytest
 
 from smartrpyc.client import Client, RemoteException
 from smartrpyc.server import MethodsRegister
@@ -15,8 +16,8 @@ from smartrpyc.tests import utils
 
 
 # noinspection PyUnusedLocal
-class SmartRPCTest(utils.FunctionalTest):
-    def setUp(self):
+class TestSmartrpcFunctionality(object):
+    def get_methods(self):
 
         methods = MethodsRegister()
 
@@ -48,148 +49,156 @@ class SmartRPCTest(utils.FunctionalTest):
         def raise_value_error(request, *a, **kw):
             raise ValueError
 
-        self.addr = get_random_ipc_socket()
-        self.start_server(methods, self.addr)
-
-    def tearDown(self):
-        self.stop_server()
+        return methods
 
     def test_simple_call(self):
-        context = zmq.Context()
-        socket = context.socket(zmq.REQ)
-        socket.connect(self.addr)
-        socket.send(msgpack.packb({
-            'm': 'method1',
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual({'r': 'Hello, world!'}, response)
+        addr = get_random_ipc_socket()
+        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
+            context = zmq.Context()
+            socket = context.socket(zmq.REQ)
+            socket.connect(addr)
+            socket.send(msgpack.packb({
+                'm': 'method1',
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': 'Hello, world!'}
 
     def test_concurrent_calls(self):
-        context = zmq.Context()
-        sockets = {}
-        socket_ids = range(10)
+        addr = get_random_ipc_socket()
+        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
 
-        random.shuffle(socket_ids)
-        for i in socket_ids:
-            sockets[i] = context.socket(zmq.REQ)
-            sockets[i].connect(self.addr)
+            context = zmq.Context()
+            sockets = {}
+            socket_ids = range(10)
 
-        random.shuffle(socket_ids)
-        for i in socket_ids:
-            sockets[i].send(msgpack.packb({
-                'm': 'method2',
-                'a': ['socket {0}'.format(i)],
-            }, encoding='utf-8'))
+            random.shuffle(socket_ids)
+            for i in socket_ids:
+                sockets[i] = context.socket(zmq.REQ)
+                sockets[i].connect(addr)
 
-        random.shuffle(socket_ids)
-        for i in socket_ids:
-            response = msgpack.unpackb(sockets[i].recv(), encoding='utf-8')
-            self.assertDictEqual(
-                {'r': 'Hello, socket {0}!'.format(i)},
-                response)
+            random.shuffle(socket_ids)
+            for i in socket_ids:
+                sockets[i].send(msgpack.packb({
+                    'm': 'method2',
+                    'a': ['socket {0}'.format(i)],
+                }, encoding='utf-8'))
+
+            random.shuffle(socket_ids)
+            for i in socket_ids:
+                response = msgpack.unpackb(sockets[i].recv(), encoding='utf-8')
+                assert response == {'r': 'Hello, socket {0}!'.format(i)}
 
     def test_call_with_args(self):
-        context = zmq.Context()
-        socket = context.socket(zmq.REQ)
-        socket.connect(self.addr)
-        socket.send(msgpack.packb({
-            'm': 'method2',
-            'a': ['WORLD'],
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual({'r': 'Hello, WORLD!'}, response)
+        addr = get_random_ipc_socket()
+        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
+            context = zmq.Context()
+            socket = context.socket(zmq.REQ)
+            socket.connect(addr)
+            socket.send(msgpack.packb({
+                'm': 'method2',
+                'a': ['WORLD'],
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': 'Hello, WORLD!'}
 
     def test_call_with_args_utf8(self):
-        context = zmq.Context()
-        socket = context.socket(zmq.REQ)
-        socket.connect(self.addr)
+        addr = get_random_ipc_socket()
+        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
 
-        socket.send(msgpack.packb({
-            'm': 'method2',
-            'a': [u'WORLD'],
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual({'r': u'Hello, WORLD!'}, response)
+            context = zmq.Context()
+            socket = context.socket(zmq.REQ)
+            socket.connect(addr)
 
-        socket.send(msgpack.packb({
-            'm': 'method2',
-            'a': [u'Ẅøřłđ'],
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual(
-            {'r': u'Hello, Ẅøřłđ!'},
-            response)
+            socket.send(msgpack.packb({
+                'm': 'method2',
+                'a': [u'WORLD'],
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': u'Hello, WORLD!'}
+
+            socket.send(msgpack.packb({
+                'm': 'method2',
+                'a': [u'Ẅøřłđ'],
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': u'Hello, Ẅøřłđ!'}
 
     def test_call_with_kwargs(self):
-        context = zmq.Context()
-        socket = context.socket(zmq.REQ)
-        socket.connect(self.addr)
-        socket.send(msgpack.packb({
-            'm': 'method2',
-            'k': {'name': 'WORLD'},
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual({'r': 'Hello, WORLD!'}, response)
+        addr = get_random_ipc_socket()
+        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
+            context = zmq.Context()
+            socket = context.socket(zmq.REQ)
+            socket.connect(addr)
+            socket.send(msgpack.packb({
+                'm': 'method2',
+                'k': {'name': 'WORLD'},
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': 'Hello, WORLD!'}
 
     def test_call_with_multi_args(self):
-        context = zmq.Context()
-        socket = context.socket(zmq.REQ)
-        socket.connect(self.addr)
+        addr = get_random_ipc_socket()
+        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
+            context = zmq.Context()
+            socket = context.socket(zmq.REQ)
+            socket.connect(addr)
 
-        socket.send(msgpack.packb({
-            'm': 'method3',
-            'k': {'name': 'WORLD'},
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual({'r': 'Hello, WORLD!'}, response)
+            socket.send(msgpack.packb({
+                'm': 'method3',
+                'k': {'name': 'WORLD'},
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': 'Hello, WORLD!'}
 
-        socket.send(msgpack.packb({
-            'm': 'method3',
-            'k': {'greeting': 'HOWDY'},
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual({'r': 'HOWDY, world!'}, response)
+            socket.send(msgpack.packb({
+                'm': 'method3',
+                'k': {'greeting': 'HOWDY'},
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': 'HOWDY, world!'}
 
-        socket.send(msgpack.packb({
-            'm': 'method3',
-            'k': {'greeting': 'HOWDY', 'name': 'MAN'},
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual({'r': 'HOWDY, MAN!'}, response)
+            socket.send(msgpack.packb({
+                'm': 'method3',
+                'k': {'greeting': 'HOWDY', 'name': 'MAN'},
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': 'HOWDY, MAN!'}
 
-        socket.send(msgpack.packb({
-            'm': 'method3',
-            'a': ('hey', 'man'),
-        }, encoding='utf-8'))
-        response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-        self.assertDictEqual({'r': 'hey, man!'}, response)
+            socket.send(msgpack.packb({
+                'm': 'method3',
+                'a': ('hey', 'man'),
+            }, encoding='utf-8'))
+            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+            assert response == {'r': 'hey, man!'}
 
     def test_with_client(self):
-        client = Client(self.addr)
-        self.assertEqual('Hello, world!', client.method1())
+        addr = get_random_ipc_socket()
+        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
+            client = Client(addr)
+            assert client.method1() == 'Hello, world!'
 
-        with self.assertRaises(RemoteException):
-            client.method1('this', 'does not', 'accept arguments!')
+            with pytest.raises(RemoteException):
+                client.method1('this', 'does not', 'accept arguments!')
 
-        self.assertEqual(u'Hello, WORLD!', client.method2(u'WORLD'))
-        self.assertEqual(u'Hello, WORLD!', client.method2(name=u'WORLD'))
-        self.assertEqual(u'Hello, Ẅøřłđ!', client.method2(name=u'Ẅøřłđ'))
+            assert client.method2(u'WORLD') == u'Hello, WORLD!'
+            assert client.method2(name=u'WORLD') == u'Hello, WORLD!'
+            assert client.method2(name=u'Ẅøřłđ') == u'Hello, Ẅøřłđ!'
 
-        self.assertEqual('Hi, man!', client.method3('Hi', 'man'))
-        self.assertEqual('Hi, man!', client.method3(greeting='Hi', name='man'))
-        self.assertEqual('Hi, world!', client.method3(greeting='Hi'))
+            assert client.method3('Hi', 'man') == 'Hi, man!'
+            assert client.method3(greeting='Hi', name='man') == 'Hi, man!'
+            assert client.method3(greeting='Hi') == 'Hi, world!'
 
-        with self.assertRaises(RemoteException):
-            client.method3('HELLO', greeting='Hi')
+            with pytest.raises(RemoteException):
+                client.method3('HELLO', greeting='Hi')
 
-        self.assertListEqual(client.get_list(), ['this', 'is', 'a', 'list'])
-        self.assertDictEqual(client.get_dict(), {'this': 'is', 'a': 'dict'})
+            assert client.get_list() == ['this', 'is', 'a', 'list']
+            assert client.get_dict() == {'this': 'is', 'a': 'dict'}
 
-        with self.assertRaises(RemoteException):
-            client.raise_value_error()
+            with pytest.raises(RemoteException):
+                client.raise_value_error()
 
-        ## Ok, the method doesn't exist, no big deal..
-        with self.assertRaises(RemoteException):
-            client.no_such_method()
+            ## Ok, the method doesn't exist, no big deal..
+            with pytest.raises(RemoteException):
+                client.no_such_method()
 
-        client.method1()  # The server must still be alive here..
+            client.method1()  # The server must still be alive here..

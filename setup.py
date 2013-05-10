@@ -2,6 +2,7 @@
 
 import sys
 from setuptools import setup, find_packages
+from setuptools.command.test import test as TestCommand
 
 ## Hack: prevent gc from destroying some stuff before atexit
 ## Needed to prevent annoying error message after test run
@@ -18,7 +19,7 @@ install_requires = [
     'msgpack-python',
 ]
 
-tests_require = ['cool_logging']
+tests_require = ['pytest', 'cool_logging']
 
 extra = {}
 if sys.version_info >= (3,):
@@ -26,9 +27,21 @@ if sys.version_info >= (3,):
     #extra['convert_2to3_doctests'] = ['src/your/module/README.txt']
     #extra['use_2to3_fixers'] = ['your.fixers']
 
-if sys.version_info <= (2, 7):
-    ## We need unittest2 for Python < 2.7
-    tests_require.append('unittest2')
+# if sys.version_info <= (2, 7):
+#     ## We need unittest2 for Python < 2.7
+#     tests_require.append('unittest2')
+
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = ['smartrpyc/tests']
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
 
 setup(
     name='SmartRPyC',
@@ -52,5 +65,6 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     package_data={'': ['README.rst', 'LICENSE']},
+    cmdclass={'test': PyTest},
     **extra
 )

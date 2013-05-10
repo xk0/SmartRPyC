@@ -3,10 +3,8 @@
 Tests for serialization
 """
 
-from smartrpyc.tests.utils import unittest
 
-
-class SerializationTestCase(unittest.TestCase):
+class TestSerialization(object):
     def _run_serialization_tests(self, packer, support_bytes=True):
         test_values = [
             ## These should present no significant problems!
@@ -49,9 +47,9 @@ class SerializationTestCase(unittest.TestCase):
 
         for value in test_values:
             _new_value = packer.unpackb(packer.packb(value))
-            self.assertEqual(value, _new_value)
+            assert value == _new_value
             if support_bytes:
-                self.assertEqual(type(value), type(_new_value))
+                assert type(value) == type(_new_value)
 
     def test_serialization_msgpack(self):
         from smartrpyc.utils.serialization import MsgPackSerializer

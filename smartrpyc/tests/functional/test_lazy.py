@@ -1,33 +1,38 @@
+import pytest
 from smartrpyc.server import MethodsRegister
 from smartrpyc.client import pirate
 from smartrpyc.client import exceptions
-from smartrpyc.tests import utils
 from smartrpyc.utils import get_random_ipc_socket
+from smartrpyc.tests import utils
 
 
-class LazyClient(utils.FunctionalTest):
+class TestLazyClient(object):
 
-    def setUp(self):
+    def get_methods(self):
         self.methods = MethodsRegister()
 
         @self.methods.register
         def hello(request):
             return "world"
 
-        self.addr = get_random_ipc_socket()
+        return self.methods
+
+        # self.addr = get_random_ipc_socket()
 
     def test_server_active(self):
-        proc = self.start_server(self.methods, self.addr)
-        proc.join(1)
+        addr = get_random_ipc_socket()
 
-        # retries 3, timeout 3
-        c = pirate.Lazy(address=self.addr)
-        self.assertEqual('world', c.hello())
-        self.stop_server()
+        with utils.TestingServer(self.get_methods(), addr) as proc:
+            proc.join(1)
+
+            # retries 3, timeout 3
+            c = pirate.Lazy(address=addr)
+            assert 'world' == c.hello()
 
     def test_server_unavailable(self):
         # retries 3, timeout 3
-        c = pirate.Lazy(retries=1, timeout=0, address=self.addr)
+        addr = get_random_ipc_socket()
+        c = pirate.Lazy(retries=1, timeout=0, address=addr)
 
-        with self.assertRaises(exceptions.ServerUnavailable):
+        with pytest.raises(exceptions.ServerUnavailable):
             c.hello()
