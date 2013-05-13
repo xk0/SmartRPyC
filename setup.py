@@ -26,7 +26,7 @@ if sys.version_info >= (3,):
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['smartrpyc/tests']
+        self.test_args = ['--ignore=build', '.']
         self.test_suite = True
 
     def run_tests(self):
