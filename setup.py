@@ -5,7 +5,7 @@ from pkg_resources import normalize_path
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-
+## Import version without tainting sys.modules
 version = __import__('smartrpyc').__version__
 if 'smartrpyc' in sys.modules:
     del sys.modules['smartrpyc']
@@ -15,8 +15,6 @@ install_requires = [
     'pyzmq',
     'msgpack-python',
 ]
-
-tests_require = ['pytest', 'cool_logging']
 
 extra = {}
 if sys.version_info >= (3,):
@@ -69,7 +67,7 @@ setup(
     description='SmartRPyC is a ZeroMQ-based RPC library for Python',
     long_description='SmartRPyC is a ZeroMQ-based RPC library for Python',
     install_requires=install_requires,
-    tests_require=tests_require,
+    tests_require=['pytest'],
     test_suite='smartrpyc.tests',
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
