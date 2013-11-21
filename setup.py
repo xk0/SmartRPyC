@@ -1,7 +1,7 @@
 ## SmartRPyC setup.py
 
+import os
 import sys
-from pkg_resources import normalize_path
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
@@ -24,20 +24,32 @@ if sys.version_info >= (3,):
 
 
 class PyTest(TestCommand):
+    test_package_name = 'smartrpyc'
+
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['--ignore=build', '.']
+        _test_args = [
+            '--verbose',
+            '--ignore=build',
+            '--pep8',
+        ]
+        extra_args = os.environ.get('PYTEST_EXTRA_ARGS')
+        if extra_args is not None:
+            _test_args.extend(extra_args.split())
+        self.test_args = _test_args
         self.test_suite = True
 
     def run_tests(self):
-        from pkg_resources import _namespace_packages
         import pytest
+        from pkg_resources import normalize_path, _namespace_packages
 
         # Purge modules under test from sys.modules. The test loader will
         # re-import them from the build location. Required when 2to3 is used
         # with namespace packages.
-        if sys.version_info >= (3,) and getattr(self.distribution, 'use_2to3', False):
-            module = self.test_args[-1].split('.')[0]
+        if sys.version_info >= (3,) and \
+                getattr(self.distribution, 'use_2to3', False):
+            #module = self.test_args[-1].split('.')[0]
+            module = self.test_package_name
             if module in _namespace_packages:
                 del_modules = []
                 if module in sys.modules:
@@ -48,9 +60,15 @@ class PyTest(TestCommand):
                         del_modules.append(name)
                 map(sys.modules.__delitem__, del_modules)
 
-            ## Run on the build directory for 2to3-built code..
+            ## Run on the build directory for 2to3-built code
+            ## This will prevent the old 2.x code from being found
+            ## by py.test discovery mechanism, that apparently
+            ## ignores sys.path..
             ei_cmd = self.get_finalized_command("egg_info")
-            self.test_args = [normalize_path(ei_cmd.egg_base)]
+
+            ## Replace the module name with normalized path
+            #self.test_args[-1] = normalize_path(ei_cmd.egg_base)
+            self.test_args.append(normalize_path(ei_cmd.egg_base))
 
         errno = pytest.main(self.test_args)
         sys.exit(errno)
@@ -60,7 +78,7 @@ setup(
     name='SmartRPyC',
     version=version,
     packages=find_packages(),
-    url='',
+    url='http://xk0.github.io/SmartRPyC',
     license='Apache License, Version 2.0, January 2004',
     author='Samuele Santi - Flavio Percoco',
     author_email='samuele@samuelesanti.com - flaper87@flaper87.org',
@@ -79,5 +97,4 @@ setup(
     ],
     package_data={'': ['README.rst', 'LICENSE']},
     cmdclass={'test': PyTest},
-    **extra
-)
+    **extra)
