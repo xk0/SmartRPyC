@@ -59,6 +59,8 @@ tramp
 # SublimeText project files
 *.sublime-workspace
 
+/.ropeproject
+
 # Project-specific
 /conf
 /.venv
