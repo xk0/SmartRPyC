@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>smartrpyc.utils.serialization &mdash; SmartRPyC 0.1-beta3 documentation</title>
+    <title>smartrpyc.utils.serialization &mdash; SmartRPyC 0.1-beta5 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.1-beta3',
+        VERSION:     '0.1-beta5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="SmartRPyC 0.1-beta3 documentation" href="../../../index.html" />
+    <link rel="top" title="SmartRPyC 0.1-beta5 documentation" href="../../../index.html" />
     <link rel="up" title="smartrpyc.utils" href="../utils.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta5 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../utils.html" accesskey="U">smartrpyc.utils</a> &raquo;</li> 
       </ul>
@@ -81,25 +81,17 @@
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="CustomMsgPackSerializer.packb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.CustomMsgPackSerializer.packb">[docs]</a>    <span class="k">def</span> <span class="nf">packb</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">msgpack</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">_pack_strings</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
-        <span class="c"># packer = CustomPacker()</span>
-        <span class="c"># return packer.pack(o)</span>
 </div>
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="CustomMsgPackSerializer.unpackb"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.CustomMsgPackSerializer.unpackb">[docs]</a>    <span class="k">def</span> <span class="nf">unpackb</span><span class="p">(</span><span class="n">packed</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_unpack_strings</span><span class="p">(</span><span class="n">msgpack</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">packed</span><span class="p">))</span>
-        <span class="c"># unpacker = CustomUnpacker(None)</span>
-        <span class="c"># unpacker.feed(packed)</span>
-        <span class="c"># ret = unpacker._fb_unpack()</span>
-        <span class="c"># if unpacker._fb_got_extradata():</span>
-        <span class="c">#     raise ExtraData(ret, unpacker._fb_get_extradata())</span>
-        <span class="c"># return ret</span>
 
 </div></div>
 <span class="k">def</span> <span class="nf">_pack_strings</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Unicode</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;u&quot;</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">b</span><span class="s">&quot;u&quot;</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;b&quot;</span> <span class="o">+</span> <span class="n">o</span>
+        <span class="k">return</span> <span class="n">b</span><span class="s">&quot;b&quot;</span> <span class="o">+</span> <span class="n">o</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">(</span><span class="n">_pack_strings</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">_pack_strings</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
@@ -112,11 +104,11 @@
 
 <span class="k">def</span> <span class="nf">_unpack_strings</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;u&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="n">b</span><span class="s">&#39;u&#39;</span><span class="p">,</span> <span class="nb">ord</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;u&#39;</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;b&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="n">b</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="nb">ord</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;b&#39;</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Invalid string object prefix {}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Invalid string object prefix {0}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">(</span><span class="n">_unpack_strings</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">_unpack_strings</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
@@ -125,30 +117,6 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">_unpack_strings</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">o</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">o</span>
-
-
-<span class="c"># class CustomPacker(msgpack.fallback.Packer):</span>
-<span class="c">#     def _pack(self, obj, *args, **kwargs):</span>
-<span class="c">#</span>
-<span class="c">#         if isinstance(obj, Unicode):</span>
-<span class="c">#             obj = &quot;u&quot; + obj.encode(&#39;utf-8&#39;)</span>
-<span class="c">#</span>
-<span class="c">#         elif isinstance(obj, bytes):</span>
-<span class="c">#             obj = &quot;b&quot; + obj</span>
-<span class="c">#</span>
-<span class="c">#         return super(CustomPacker, self)._pack(obj, *args, **kwargs)</span>
-<span class="c">#</span>
-<span class="c">#</span>
-<span class="c"># class CustomUnpacker(msgpack.fallback.Unpacker):</span>
-<span class="c">#     def _fb_unpack(self, *args, **kwargs):</span>
-<span class="c">#         data = super(CustomUnpacker, self)._fb_unpack(*args, **kwargs)</span>
-<span class="c">#         if isinstance(data, bytes):</span>
-<span class="c">#             if data[0] == &#39;u&#39;:</span>
-<span class="c">#                 return data[1:].decode(&#39;utf-8&#39;)</span>
-<span class="c">#             elif data[0] == &#39;b&#39;:</span>
-<span class="c">#                 return data[1:]</span>
-<span class="c">#             raise ValueError(&quot;Invalid string object prefix {}!&quot;.format(data[0]))</span>
-<span class="c">#         return data</span>
 
 
 <div class="viewcode-block" id="JsonSerializer"><a class="viewcode-back" href="../../../api/utils.html#smartrpyc.utils.serialization.JsonSerializer">[docs]</a><span class="k">class</span> <span class="nc">JsonSerializer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -213,7 +181,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">SmartRPyC 0.1-beta3 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">SmartRPyC 0.1-beta5 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../utils.html" >smartrpyc.utils</a> &raquo;</li> 
       </ul>
