@@ -64,6 +64,8 @@ class TestSmartrpcFunctionality(object):
             assert response == {'r': 'Hello, world!'}
 
     def test_concurrent_calls(self):
+        # todo: this thing hangs forever in case an exception was raised
+        #       in the server -- figure out why!
         addr = get_random_ipc_socket()
         with utils.TestingServer(methods=self.get_methods(), addresses=addr):
 

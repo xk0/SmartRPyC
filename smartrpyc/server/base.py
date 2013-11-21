@@ -2,6 +2,7 @@
 Base objects for the RPC
 """
 
+from collections import defaultdict
 import logging
 
 import zmq
@@ -33,6 +34,11 @@ class Request(object):
         return self.raw["i"]
 
     @property
+    def route(self):
+        """Route of the request"""
+        return self.raw.get('route', '')
+
+    @property
     def method(self):
         """Name of the method to be called"""
         return self.raw['m']
@@ -49,8 +55,15 @@ class Request(object):
 
 
 class Server(object):
+    """
+    SmartRPyC Server object
+
+    :attr request_class: Class to be used for requests
+    """
+
     request_class = Request
     packer = MsgPackSerializer
+    middleware = None
 
     def __init__(self, methods=None):
         """
@@ -63,11 +76,17 @@ class Server(object):
             the specified method, or raising an exception if the method
             was not found.
         """
-        self.methods = methods
-        if self.methods is None:
-            self.methods = MethodsRegister()
-
+        self._routes = defaultdict(MethodsRegister)
+        self.methods = methods if methods is not None else MethodsRegister()
         self.middleware = []  # Middleware chain
+
+    @property
+    def methods(self):
+        return self._routes['']
+
+    @methods.setter
+    def methods(self, value):
+        self._routes[''] = value
 
     @lazy_property
     def socket(self):
@@ -112,10 +131,28 @@ class Server(object):
     def run_once(self):
         """Run once: process a request and send a response"""
         message_raw = self.socket.recv()
-        request = self.request_class(self.packer.unpackb(message_raw))
-        request.server = self
-        response = self._process_request(request)
-        self.socket.send(self.packer.packb(response))
+        try:
+            request = self.request_class(self.packer.unpackb(message_raw))
+            request.server = self
+            response = self._process_request(request)
+        except Exception, e:
+            ## If anything bad happened, send an exception message
+            ## to the user.
+            ## We need to make damn sure something is sent to the client,
+            ## or the request will hang forever..
+            ## We might as well want a way to timeout connections, to prevent
+            ## hanging at all...
+            self.socket.send(
+                self.packer.packb(
+                    self._exception_message(e)))
+        else:
+            ## Send the response message to the client
+            self.socket.send(self.packer.packb(response))
+
+    def _lookup_method(self, request):
+        """Find method to be used for this request"""
+        route = self._routes[request.route]
+        return route.lookup(request.method)
 
     def _process_request(self, request):
         """Process a received request"""
@@ -127,10 +164,14 @@ class Server(object):
 
         ## Lookup the requested method
         try:
-            method = self.methods.lookup(request.method)
+            method = self._lookup_method(request)
         except KeyError:
-            msg = 'No such method: {0}'.format(request.method)
+            msg = 'No such method for route {route}: {method}'\
+                  ''.format(route=request.route, method=request.method)
             logger.error(msg)
+
+            ## We don't terminate here, as a "pre" middleware
+            ## might have a solution for this..
             exception = KeyError(msg)
 
         ## Execute all the PRE middleware on the request
@@ -147,7 +188,7 @@ class Server(object):
             exception = None  # Clear exceptions happened before..
 
         except Exception, e:
-            logger.exception('Exception during execution of PRE middleware')
+            logger.exception('Exception during execution of "pre" middleware')
             return self._exception_message(e)
 
         ## If the method is still None, return the current exception
@@ -172,11 +213,12 @@ class Server(object):
                 request, method, response, exception)
         except DirectResponse, e:
             logger.info(
-                "A POST middleware requested immediate returning "
-                "of a response")
+                'A "post" middleware requested immediate returning '
+                'of a response')
             return self._response_message(e.response)
         except Exception, e:
-            logger.exception('Exception during execution of POST middleware')
+            logger.exception('Exception during execution of "post" middleware')
+            ## Exceptions in the POST middleware are fatal..
             return self._exception_message(e)
 
         ## If there was an exception, return it as a special message
@@ -187,20 +229,49 @@ class Server(object):
         return self._response_message(response)
 
     def _exception_message(self, exception):
+        """
+        Create a response object indicating an exception occurred.
+
+        :param exception:
+            The original exception
+        :return:
+            An object with the ``e`` (name) and ``e_msg`` (message) keys.
+        """
         return {
             'e': type(exception).__name__,
             'e_msg': str(exception),
         }
 
     def _response_message(self, response):
+        """
+        Create a "normal" response message.
+
+        The message is simply a dict with an ``r`` key containing
+        the result value. This is needed to distinguish between
+        return values and exceptions.
+        """
         return {'r': response}
 
     def _exec_pre_middleware(self, request, method):
+        """
+        Run all the "pre" middleware functions
+
+        :param request: The request being processed
+        :param method: The method that will be used to process the request
+        """
         for mw in self.middleware:
             if hasattr(mw, 'pre'):
                 mw.pre(request, method)
 
     def _exec_post_middleware(self, request, method, response, exception):
+        """
+        Run all the "post" middleware functions
+
+        :param request: The original request object
+        :param method: The figured out method for the request
+        :param response: Response from the method (if any)
+        :param exception: Exception raised from the method (if any)
+        """
         for mw in reversed(self.middleware):
             if hasattr(mw, 'post'):
                 retval = mw.post(request, method, response, exception)
