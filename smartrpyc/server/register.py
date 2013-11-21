@@ -99,7 +99,8 @@ class MethodsRegister(MethodsRegisterBase):
         :params function:
             Callable function
         """
-        if not isinstance(name, basestring) and not callable(function):
+        if not isinstance(name, basestring) and \
+                not callable(function):
             # If we get here, most likely, the user has passed
             # a non callable function. See unittest for a clearer
             # example.
