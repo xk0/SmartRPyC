@@ -17,4 +17,3 @@ class LoginRequired(RpcServiceException):
 
 class NotAuthorized(RpcServiceException):
     pass
-

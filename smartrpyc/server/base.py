@@ -172,7 +172,8 @@ class Server(object):
                 request, method, response, exception)
         except DirectResponse, e:
             logger.info(
-                "A POST middleware requested immediate returning of a response")
+                "A POST middleware requested immediate returning "
+                "of a response")
             return self._response_message(e.response)
         except Exception, e:
             logger.exception('Exception during execution of POST middleware')
