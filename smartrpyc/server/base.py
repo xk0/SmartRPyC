@@ -55,12 +55,6 @@ class Request(object):
 
 
 class Server(object):
-    """
-    SmartRPyC Server object
-
-    :attr request_class: Class to be used for requests
-    """
-
     request_class = Request
     packer = MsgPackSerializer
     middleware = None
@@ -76,17 +70,17 @@ class Server(object):
             the specified method, or raising an exception if the method
             was not found.
         """
-        self._routes = defaultdict(MethodsRegister)
+        self.routes = defaultdict(MethodsRegister)
         self.methods = methods if methods is not None else MethodsRegister()
         self.middleware = []  # Middleware chain
 
     @property
     def methods(self):
-        return self._routes['']
+        return self.routes['']
 
     @methods.setter
     def methods(self, value):
-        self._routes[''] = value
+        self.routes[''] = value
 
     @lazy_property
     def socket(self):
@@ -151,7 +145,7 @@ class Server(object):
 
     def _lookup_method(self, request):
         """Find method to be used for this request"""
-        route = self._routes[request.route]
+        route = self.routes[request.route]
         return route.lookup(request.method)
 
     def _process_request(self, request):
