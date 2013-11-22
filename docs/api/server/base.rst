@@ -12,16 +12,29 @@ This is the main Server class.
 .. autoclass:: Server
     :members:
     :undoc-members:
-    :exclude-members: packer, request_class
+    :exclude-members: packer, request_class, methods, middleware
+
+    .. py:attribute:: routes
+
+        .. versionadded:: 0.1-beta6
+
+        Object mapping route names to :py:class:`.MethodsRegister` objects
+	(or equivalent), containing the actual methods to be exposed.
+
+	In the default implementation, this is a ``defaultdict``, allowing
+	to write things like this, without having to care about creating
+	the ``MethodsRegister`` object manually:
+
+	.. code-block:: python
+
+	    @server.routes['hello_world'].register
+	    def hello(request):
+                return "World"
 
     .. py:attribute:: methods
 
-        A :py:class:`.MethodsRegister` object containing
-        the methods to be exposed via the RPC.
-
-        Usually this should **not** be replaced directly, but you can use
-        its :py:meth:`~.MethodsRegister.register` method to add new
-        methods.
+        A property pointing to ``routes['']``. Mostly for background compatibility,
+	this might be deprecated in future versions.
 
     .. py:attribute:: packer
 
@@ -38,6 +51,10 @@ This is the main Server class.
     .. py:attribute:: socket
 
         The underlying ZeroMQ REP socket. Do not tamper with this.
+
+    .. py:attribute:: middleware
+
+        Middleware objects to be called before/after processing requests.
 
 
 The request object
