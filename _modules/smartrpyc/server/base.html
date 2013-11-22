@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -51,6 +53,7 @@
 <span class="sd">Base objects for the RPC</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">zmq</span>
@@ -82,6 +85,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="p">[</span><span class="s">&quot;i&quot;</span><span class="p">]</span>
 </div>
     <span class="nd">@property</span>
+<div class="viewcode-block" id="Request.route"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Request.route">[docs]</a>    <span class="k">def</span> <span class="nf">route</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Route of the request&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;route&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
 <div class="viewcode-block" id="Request.method"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Request.method">[docs]</a>    <span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Name of the method to be called&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span><span class="p">[</span><span class="s">&#39;m&#39;</span><span class="p">]</span>
@@ -100,6 +108,7 @@
 <div class="viewcode-block" id="Server"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server">[docs]</a><span class="k">class</span> <span class="nc">Server</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">request_class</span> <span class="o">=</span> <span class="n">Request</span>
     <span class="n">packer</span> <span class="o">=</span> <span class="n">MsgPackSerializer</span>
+    <span class="n">middleware</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -112,12 +121,18 @@
 <span class="sd">            the specified method, or raising an exception if the method</span>
 <span class="sd">            was not found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="o">=</span> <span class="n">methods</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="o">=</span> <span class="n">MethodsRegister</span><span class="p">()</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_routes</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">MethodsRegister</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="o">=</span> <span class="n">methods</span> <span class="k">if</span> <span class="n">methods</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">MethodsRegister</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">middleware</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># Middleware chain</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routes</span><span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">]</span>
+
+    <span class="nd">@methods.setter</span>
+<div class="viewcode-block" id="Server.methods"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server.methods">[docs]</a>    <span class="k">def</span> <span class="nf">methods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_routes</span><span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</div>
     <span class="nd">@lazy_property</span>
 <div class="viewcode-block" id="Server.socket"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server.socket">[docs]</a>    <span class="k">def</span> <span class="nf">socket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
@@ -161,11 +176,29 @@
 <div class="viewcode-block" id="Server.run_once"><a class="viewcode-back" href="../../../api/server/base.html#smartrpyc.server.base.Server.run_once">[docs]</a>    <span class="k">def</span> <span class="nf">run_once</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run once: process a request and send a response&quot;&quot;&quot;</span>
         <span class="n">message_raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">packer</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">message_raw</span><span class="p">))</span>
-        <span class="n">request</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="bp">self</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">packer</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">packer</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span><span class="n">message_raw</span><span class="p">))</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c">## If anything bad happened, send an exception message</span>
+            <span class="c">## to the user.</span>
+            <span class="c">## We need to make damn sure something is sent to the client,</span>
+            <span class="c">## or the request will hang forever..</span>
+            <span class="c">## We might as well want a way to timeout connections, to prevent</span>
+            <span class="c">## hanging at all...</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">packer</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_exception_message</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">## Send the response message to the client</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">packer</span><span class="o">.</span><span class="n">packb</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
 </div>
+    <span class="k">def</span> <span class="nf">_lookup_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find method to be used for this request&quot;&quot;&quot;</span>
+        <span class="n">route</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routes</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">route</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">route</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Process a received request&quot;&quot;&quot;</span>
 
@@ -176,10 +209,14 @@
 
         <span class="c">## Lookup the requested method</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup_method</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;No such method: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;No such method for route {route}: {method}&#39;</span>\
+                  <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">route</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">route</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c">## We don&#39;t terminate here, as a &quot;pre&quot; middleware</span>
+            <span class="c">## might have a solution for this..</span>
             <span class="n">exception</span> <span class="o">=</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="c">## Execute all the PRE middleware on the request</span>
@@ -196,7 +233,7 @@
             <span class="n">exception</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c"># Clear exceptions happened before..</span>
 
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&#39;Exception during execution of PRE middleware&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&#39;Exception during execution of &quot;pre&quot; middleware&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception_message</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
         <span class="c">## If the method is still None, return the current exception</span>
@@ -221,10 +258,12 @@
                 <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">DirectResponse</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s">&quot;A POST middleware requested immediate returning of a response&quot;</span><span class="p">)</span>
+                <span class="s">&#39;A &quot;post&quot; middleware requested immediate returning &#39;</span>
+                <span class="s">&#39;of a response&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response_message</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&#39;Exception during execution of POST middleware&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&#39;Exception during execution of &quot;post&quot; middleware&#39;</span><span class="p">)</span>
+            <span class="c">## Exceptions in the POST middleware are fatal..</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception_message</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
         <span class="c">## If there was an exception, return it as a special message</span>
@@ -235,20 +274,49 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response_message</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_exception_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a response object indicating an exception occurred.</span>
+
+<span class="sd">        :param exception:</span>
+<span class="sd">            The original exception</span>
+<span class="sd">        :return:</span>
+<span class="sd">            An object with the ``e`` (name) and ``e_msg`` (message) keys.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s">&#39;e&#39;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
             <span class="s">&#39;e_msg&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="p">),</span>
         <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_response_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a &quot;normal&quot; response message.</span>
+
+<span class="sd">        The message is simply a dict with an ``r`` key containing</span>
+<span class="sd">        the result value. This is needed to distinguish between</span>
+<span class="sd">        return values and exceptions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s">&#39;r&#39;</span><span class="p">:</span> <span class="n">response</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_exec_pre_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run all the &quot;pre&quot; middleware functions</span>
+
+<span class="sd">        :param request: The request being processed</span>
+<span class="sd">        :param method: The method that will be used to process the request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">&#39;pre&#39;</span><span class="p">):</span>
                 <span class="n">mw</span><span class="o">.</span><span class="n">pre</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_exec_post_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run all the &quot;post&quot; middleware functions</span>
+
+<span class="sd">        :param request: The original request object</span>
+<span class="sd">        :param method: The figured out method for the request</span>
+<span class="sd">        :param response: Response from the method (if any)</span>
+<span class="sd">        :param exception: Exception raised from the method (if any)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s">&#39;post&#39;</span><span class="p">):</span>
                 <span class="n">retval</span> <span class="o">=</span> <span class="n">mw</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
@@ -294,7 +362,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013 - Samuele Santi, Flavio Percoco.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
