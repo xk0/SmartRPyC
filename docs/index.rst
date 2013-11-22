@@ -40,6 +40,7 @@ Contents
 
    getting_started
    api/index
+   wire-protocol
 
 
 Indices and tables
