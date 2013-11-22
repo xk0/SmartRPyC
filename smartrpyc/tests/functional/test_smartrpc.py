@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-Tests for SmartRPC
+Tests for SmartRPyC
 """
 
 import random

@@ -54,26 +54,30 @@ class Client(object):
         return socket
 
     def _do_request(self, method, args, kwargs):
+        return self._do_request_new('', method, args, kwargs)
+
+    def _do_request_new(self, route, method, args, kwargs):
         request = self._prepare_request({
             'i': str(uuid.uuid4()),
+            'r': route,
             'm': method,
             'a': args,
             'k': kwargs,
         })
-
         request = self._exec_pre_middleware(request)
-
         packed = self.packer.packb(request)
         self._socket.send(packed)
         return request
 
     def _get_response(self, request):
         response = self.packer.unpackb(self._socket.recv())
-
         response = self._exec_post_middleware(request, response)
 
         if 'e' in response:
+            ## This is an exception response
             raise RemoteException(response['e'], response.get('e_msg'))
+
+        ## This is a normal response
         return response['r']
 
     def _prepare_request(self, request):
@@ -82,24 +86,10 @@ class Client(object):
     def __getattr__(self, item):
         if item.startswith('_'):
             raise AttributeError(item)
+        return ClientMethodProxy(self, '', item)
 
-        server = self
-
-        class method_proxy(object):
-            def __call__(self, *a, **kw):
-                request = server._do_request(item, a, kw)
-                return server._get_response(request)
-
-            @lazy_property
-            def __doc__(self):
-                request = server._do_request('doc', (item,), {})
-                return server._get_response(request)
-
-        # def method_proxy(*a, **kw):
-        #     request = self._do_request(item, a, kw)
-        #     return self._get_response(request)
-
-        return method_proxy()
+    def __getitem__(self, name):
+        return ClientRouteProxy(self, name)
 
     def _exec_pre_middleware(self, request):
         for mw in self.middleware:
@@ -116,6 +106,39 @@ class Client(object):
                 if retval is not None:
                     response = retval
         return response
+
+
+class ClientRouteProxy(object):
+    """Object to be returned when asking for an item"""
+
+    def __init__(self, client, route):
+        self._client = client
+        self._route = route
+
+    def __getattr__(self, item):
+        if item.startswith('_'):
+            raise AttributeError(item)
+        return ClientMethodProxy(self._client, self._route, item)
+
+
+class ClientMethodProxy(object):
+    def __init__(self, client, route, method):
+        self._client = client
+        self._route = route
+        self._method = method
+
+    def __call__(self, *a, **kw):
+        """Actually call this method, performing the necessary request"""
+        response = self._client._do_request_new(
+            self._route, self._method, a, kw)
+        return self._client._get_response(response)
+
+    @lazy_property
+    def __doc__(self):
+        """Documentation is retrieved by calling the "doc" method"""
+        response = self._client._do_request_new(
+            self._route, 'doc', (self._method,), {})
+        return self._client._get_response(response)
 
 
 class IntrospectableClient(Client):

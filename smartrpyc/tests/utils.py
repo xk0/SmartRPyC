@@ -45,3 +45,34 @@ class TestingServer(object):
         # self.rpc_process.join(timeout=3)
         ## the thread should terminate when going out of scope..
         pass
+
+
+class ServerProcessThread(threading.Thread):
+    def __init__(self, rpcserver, addresses):
+        super(ServerProcessThread, self).__init__()
+        self._rpc = rpcserver
+        self._addresses = addresses
+
+    def run(self):
+        self._rpc.bind(self._addresses)
+        self._rpc.run()
+
+
+class NewTestingServer(object):
+    """Context manager to provide a server"""
+
+    def __init__(self, rpcserver, addresses):
+        self.rpcserver = rpcserver
+        self.addresses = addresses
+
+    def __enter__(self):
+        self.rpc_process = ServerProcessThread(self.rpcserver, self.addresses)
+        self.rpc_process.daemon = True  # Should die when orphaned
+        self.rpc_process.start()
+        return self.rpc_process
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # self.rpc_process.terminate()
+        # self.rpc_process.join(timeout=3)
+        ## the thread should terminate when going out of scope..
+        pass

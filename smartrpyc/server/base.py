@@ -31,12 +31,12 @@ class Request(object):
     @property
     def id(self):
         """Id of the request"""
-        return self.raw["i"]
+        return self.raw['i']
 
     @property
     def route(self):
         """Route of the request"""
-        return self.raw.get('route', '')
+        return self.raw.get('r', '')
 
     @property
     def method(self):
@@ -70,8 +70,9 @@ class Server(object):
             the specified method, or raising an exception if the method
             was not found.
         """
-        self.routes = defaultdict(MethodsRegister)
-        self.methods = methods if methods is not None else MethodsRegister()
+        self._routes = defaultdict(MethodsRegister)
+        if methods is not None:
+            self.methods = methods
         self.middleware = []  # Middleware chain
 
     @property
@@ -80,7 +81,20 @@ class Server(object):
 
     @methods.setter
     def methods(self, value):
+        assert isinstance(value, MethodsRegister)
         self.routes[''] = value
+
+    @property
+    def routes(self):
+        ## Prevent direct assignment
+
+        ## DAFUQ??
+        # if not all(isinstance(v, MethodsRegister)
+        #            for k, v in self._routes.iteritems()):
+        #     import pdb
+        #     pdb.set_trace()
+
+        return self._routes
 
     @lazy_property
     def socket(self):
@@ -145,8 +159,15 @@ class Server(object):
 
     def _lookup_method(self, request):
         """Find method to be used for this request"""
+        if request.route not in self.routes:
+            raise KeyError("No such route: {0!r}".format(request.route))
         route = self.routes[request.route]
-        return route.lookup(request.method)
+        try:
+            return route.lookup(request.method)
+        except:
+            raise KeyError("No such method: {method!r} (route: {route!r})"
+                           "".format(route=request.route,
+                                     method=request.method))
 
     def _process_request(self, request):
         """Process a received request"""
@@ -159,14 +180,12 @@ class Server(object):
         ## Lookup the requested method
         try:
             method = self._lookup_method(request)
-        except KeyError:
-            msg = 'No such method for route {route}: {method}'\
-                  ''.format(route=request.route, method=request.method)
-            logger.error(msg)
+        except KeyError, e:
+            logger.error(str(e))
 
             ## We don't terminate here, as a "pre" middleware
             ## might have a solution for this..
-            exception = KeyError(msg)
+            exception = e
 
         ## Execute all the PRE middleware on the request
         try:
