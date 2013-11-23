@@ -4,7 +4,7 @@ SmartRPyC
 
 A small but powerful RPC library for Python, powered by ZeroMQ_.
 
-:Version: 0.1-beta5
+:Version: 0.2-alpha
 :Build status:
     .. image:: https://travis-ci.org/xk0/SmartRPyC.png
         :alt: Build status
@@ -16,24 +16,24 @@ A small but powerful RPC library for Python, powered by ZeroMQ_.
     * `SmartRPyC GitHub pages`_
     * `SmartRPyC source code`_
     * `SmartRPyC documentation`_
-    * `SmartRPyC CheeseShop`_
+    * `SmartRPyC on PYPI`_
 
 .. _ZeroMQ: http://www.zeromq.org/
-.. _SmartRPyC documentation: http://pythonhosted.org/SmartRPyC/
 .. _SmartRPyC GitHub pages: http://xk0.github.io/SmartRPyC/
+.. _SmartRPyC documentation: http://pythonhosted.org/SmartRPyC/
+.. _SmartRPyC on PYPI: https://pypi.python.org/pypi/SmartRPyC
 .. _SmartRPyC source code: https://github.com/xk0/SmartRPyC
-.. _SmartRPyC CheeseShop: https://pypi.python.org/pypi/SmartRPyC
 
 Installing
 ==========
 
 To install it, just::
 
-    pip install smartrpyc
+    pip install smartrpyc==0.2a
 
 or, if you want the latest version from git::
 
-    pip install git+git://github.com/xk0/SmartRPyC.git
+    pip install git+git://github.com/xk0/SmartRPyC.git@master#egg=SmartRPyC
 
 
 Compatibility
