@@ -28,11 +28,7 @@ class PyTest(TestCommand):
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        _test_args = [
-            '--verbose',
-            '--ignore=build',
-            '--pep8',
-        ]
+        _test_args = '--ignore=build --verbose --pep8 -rsX'.split()
         extra_args = os.environ.get('PYTEST_EXTRA_ARGS')
         if extra_args is not None:
             _test_args.extend(extra_args.split())
