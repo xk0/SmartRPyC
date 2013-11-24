@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from .base import *
-from .exceptions import *
-from .middleware import *
-from .register import *
+from .base import *  # noqa
+from .exceptions import *  # noqa
+from .middleware import *  # noqa
+from .register import *  # noqa
