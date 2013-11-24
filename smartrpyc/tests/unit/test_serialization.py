@@ -23,7 +23,7 @@ XFAIL_NO_BYTES = (JsonSerializer,)
 
 sample_payloads = [
     ## First try with some base types
-    ('bytes', b'Hello, world. This is a bytes string.'),
+    ('bytes', b'Hello, world. This is a bytes string.', XFAIL_NO_BYTES),
     ('unicode_ascii', u'Hello, world. This is a unicode string.'),
     ('unicode_utf8', u'«¿How do you say “bacon” in your language?»'),
     ('unicode_escaped', u"\u265a\u265b\u265c\u265d"),  # Chess pieces
@@ -42,25 +42,27 @@ sample_payloads = [
     ('False', False),
 
     ## Some lists of base types
-    ('list_of_bytes', [b'spam', b'eggs', b'bacon']),
+    ('list_of_bytes', [b'spam', b'eggs', b'bacon'], XFAIL_NO_BYTES),
     ('list_of_unicode_ascii', [u'spam', u'eggs', u'bacon']),
     ('list_of_unicode_utf8', [u'spâm', u'ëggs', u'bäcøn']),
     ('list_of_mixed_bytes_unicode', [
         u'spâm', b'spam', u'ëggs', b'spam', u'bäcøn', b'spam',
-        b'spam', b'spam!']),
+        b'spam', b'spam!'], XFAIL_NO_BYTES),
     ('list_of_ints', [1, 2, 3, 4]),
 
     ## What about tuples?
-    ('tuple0', ('aaa', 'bbb', 'ccc'), XFAIL_NO_TUPLES),
-    ('tuple1', [('A', 'B', 'C'), (1, 2, 3), (1.1, 2.2)], XFAIL_NO_TUPLES),
-    ('tuple2', ('a', {'A': 'B'}), XFAIL_NO_TUPLES),
+    ('tuple0', (u'aaa', u'bbb', u'ccc'), XFAIL_NO_TUPLES),
+    ('tuple1', [(u'A', u'B', u'C'), (1, 2, 3), (1.1, 2.2)], XFAIL_NO_TUPLES),
+    ('tuple2', (u'a', {u'A': u'B'}), XFAIL_NO_TUPLES),
 
     ## Some dicts of base types
-    ('dict0', {b'spam': 0.22, b'eggs': 1.32, b'bacon': 1.8}),
+    ('dict0', {b'spam': 0.22, b'eggs': 1.32, b'bacon': 1.8}, XFAIL_NO_BYTES),
     ('dict1', {u'spâm': 0.22, u'ëggs': 1.32, u'bäcøn': 1.8}),
-    ('dict2', {b'spam': u'THIS_IS_SPAM!!', b'eggs': 1.32, b'bacon': 1.8,
-               u'spâm': u'SPÄMMY-SPAM!', u'ëggs': 1.32,
-               u'bäcøn': ['DE', 'LI', 'CIOUS!']}),
+    ('dict2',
+     {b'spam': u'THIS_IS_SPAM!!', b'eggs': 1.32, b'bacon': 1.8,
+      u'spâm': u'SPÄMMY-SPAM!', u'ëggs': 1.32,
+      u'bäcøn': ['DE', 'LI', 'CIOUS!']},
+     XFAIL_NO_BYTES),
 
     ## keys of different types..
     ('dict_with_nonstring_keys',
@@ -78,7 +80,9 @@ sample_payloads = [
     ('inv_unicode_2',
      b'Invalid characters in BYTES: \x99\x88\x00\xff',
      XFAIL_NO_BYTES),
-    ('inv_unicode_3', b'Unicode in BYTES: \u265A\u265B\u265C\u265D'),
+    ('inv_unicode_3',
+     b'Unicode in BYTES: \u265A\u265B\u265C\u265D',
+     XFAIL_NO_BYTES),
 
     ## todo: now test with other objects, such as objects and exceptions
     ## todo: make MsgpackSerializer handle tuples (w/ about long long ints?)

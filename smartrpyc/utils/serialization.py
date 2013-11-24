@@ -46,11 +46,11 @@ class JsonSerializer(object):
     """
     @staticmethod
     def packb(o):
-        return json.dumps(o)
+        return json.dumps(o).encode('utf-8')
 
     @staticmethod
     def unpackb(packed):
-        return json.loads(packed)
+        return json.loads(packed.decode('utf-8'))
 
 
 class PickleSerializer(object):
