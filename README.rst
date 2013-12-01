@@ -9,6 +9,9 @@ A small but powerful RPC library for Python, powered by ZeroMQ_.
     .. image:: https://travis-ci.org/xk0/SmartRPyC.png
         :alt: Build status
         :target: https://travis-ci.org/xk0/SmartRPyC
+:Test coverage:
+    .. image:: https://coveralls.io/repos/xk0/SmartRPyC/badge.png?branch=master
+        :target: https://coveralls.io/r/xk0/SmartRPyC?branch=master
 :Authors:
     * Samuele Santi
     * Flavio Percoco
@@ -90,5 +93,3 @@ Testing
 From the sources folder::
 
     python setup.py test
-
-
