@@ -2,28 +2,21 @@
 
 A small but powerful RPC library for Python, powered by [ZeroMQ].
 
-[![Build Status](https://travis-ci.org/xk0/SmartRPyC.png?branch=master)](https://travis-ci.org/xk0/SmartRPyC)
-[![Coverage Status](https://coveralls.io/repos/xk0/SmartRPyC/badge.png?branch=master)](https://coveralls.io/r/xk0/SmartRPyC?branch=master)
-[![PyPi version](https://pypip.in/v/SmartRPyC/badge.png)](https://crate.io/packages/SmartRPyC/)
-[![PyPi downloads](https://pypip.in/d/SmartRPyC/badge.png)](https://crate.io/packages/SmartRPyC/)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/xk0/smartrpyc/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
 [ZeroMQ]: http://www.zeromq.org/
 
+**Master branch:**
+[![Build Status](https://travis-ci.org/xk0/SmartRPyC.png?branch=master)](https://travis-ci.org/xk0/SmartRPyC)
+[![Coverage Status](https://coveralls.io/repos/xk0/SmartRPyC/badge.png?branch=master)](https://coveralls.io/r/xk0/SmartRPyC?branch=master)
+
+**Development branch:**
+[![Build Status](https://travis-ci.org/xk0/SmartRPyC.png?branch=develop)](https://travis-ci.org/xk0/SmartRPyC)
+[![Coverage Status](https://coveralls.io/repos/xk0/SmartRPyC/badge.png?branch=develop)](https://coveralls.io/r/xk0/SmartRPyC?branch=develop)
+
+**PyPi Status:**
+[![PyPi version](https://pypip.in/v/SmartRPyC/badge.png)](https://crate.io/packages/SmartRPyC/)
+[![PyPi downloads](https://pypip.in/d/SmartRPyC/badge.png)](https://crate.io/packages/SmartRPyC/)
+
 **Latest version:** 0.2-alpha
-
-**Authors**
-
-* [Samuele Santi](https://github.com/rshk)
-* [Flavio Percoco](https://github.com/FlaPer87)
-
-**Project links**
-
-* [Docs on GitHub pages](http://xk0.github.io/SmartRPyC/)
-* [Docs on PythonHosted](http://pythonhosted.org/SmartRPyC/)
-* [Source code](https://github.com/xk0/SmartRPyC)
-* [PYPI page](https://pypi.python.org/pypi/SmartRPyC)
-* [crate.io page](https://crate.io/packages/SmartRPyC/)
 
 
 ## Installing
@@ -101,3 +94,22 @@ by using ``tox``:
 % pip install tox
 % tox
 ```
+
+
+## Authors
+
+* [Samuele Santi](https://github.com/rshk)
+* [Flavio Percoco](https://github.com/FlaPer87)
+
+
+## Project links
+
+* [Docs on GitHub pages](http://xk0.github.io/SmartRPyC/)
+* [Docs on PythonHosted](http://pythonhosted.org/SmartRPyC/)
+* [Source code](https://github.com/xk0/SmartRPyC)
+* [PYPI page](https://pypi.python.org/pypi/SmartRPyC)
+* [crate.io page](https://crate.io/packages/SmartRPyC/)
+
+-----
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/xk0/smartrpyc/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
