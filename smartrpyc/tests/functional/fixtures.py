@@ -85,6 +85,44 @@ def simple_server():
     def raise_value_error(request, *a, **kw):
         raise ValueError
 
+    @methods.register
+    def divide_by_zero(request):
+        return 10 / 0
+
+    route1 = server.routes['route1']
+
+    @route1.register(name='method1')
+    def r1m1(request):
+        return "route1-method1"
+
+    @route1.register(name='method2')
+    def r1m2(request):
+        return "route1-method2"
+
+    @route1.register(name='method3')
+    def r1m3(request):
+        return "route1-method3"
+
+    route2 = server.routes['route2']
+
+    @route2.register(name='method1')
+    def r2m1(request):
+        return "route2-method1"
+
+    @route2.register(name='method2')
+    def r2m2(request):
+        return "route2-method2"
+
+    @route2.register(name='method3')
+    def r2m3(request):
+        return "route2-method3"
+
+    route3 = server.routes['route3']
+
+    @route3.register(name='method1')
+    def r3m1(request):
+        return "route3-method1"
+
     return server
 
 

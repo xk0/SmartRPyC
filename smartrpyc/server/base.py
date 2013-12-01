@@ -86,20 +86,16 @@ class Server(object):
 
     @property
     def routes(self):
-        ## Prevent direct assignment
-
-        ## DAFUQ??
-        # if not all(isinstance(v, MethodsRegister)
-        #            for k, v in self._routes.iteritems()):
-        #     import pdb
-        #     pdb.set_trace()
-
+        ## to prevent direct assignment
         return self._routes
 
     @lazy_property
+    def zmq_context(self):
+        return zmq.Context()
+
+    @lazy_property
     def socket(self):
-        context = zmq.Context()
-        return context.socket(zmq.REP)
+        return self.zmq_context.socket(zmq.REP)
 
     def bind(self, addresses):
         """
@@ -133,7 +129,8 @@ class Server(object):
 
     def run(self):
         """Start the server listening loop"""
-        while True:
+        self._running = True
+        while self._running:
             self.run_once()
 
     def run_once(self):
@@ -156,6 +153,13 @@ class Server(object):
         else:
             ## Send the response message to the client
             self.socket.send(self.packer.packb(response))
+
+    def shutdown(self):
+        """Shut down socket & context"""
+        self._running = False
+        self.socket.close()
+        self.zmq_context.term()
+        self.zmq_context.destroy()
 
     def _lookup_method(self, request):
         """Find method to be used for this request"""
@@ -291,3 +295,6 @@ class Server(object):
                 if retval is not None:
                     response = retval
         return response
+
+    def __del__(self):
+        self.shutdown()

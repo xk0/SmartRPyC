@@ -42,14 +42,21 @@ class Client(object):
     packer = MsgPackSerializer
 
     def __init__(self, address=None):
-        self._address = address
+        self._address = None
+        if address is not None:
+            self.connect(address)
         self.middleware = []  # Middleware chain
+
+    def connect(self, address):
+        self._address = address
+
+    @lazy_property
+    def _zmq_context(self):
+        return zmq.Context()
 
     @lazy_property
     def _socket(self):
-        context = zmq.Context()
-        socket = context.socket(zmq.REQ)
-        # if self._address is not None:
+        socket = self._zmq_context.socket(zmq.REQ)
         socket.connect(self._address)
         return socket
 
@@ -106,6 +113,17 @@ class Client(object):
                 if retval is not None:
                     response = retval
         return response
+
+    def shutdown(self):
+        self._socket.close()
+        self._zmq_context.term()
+        self._zmq_context.destroy()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.shutdown()
 
 
 class ClientRouteProxy(object):

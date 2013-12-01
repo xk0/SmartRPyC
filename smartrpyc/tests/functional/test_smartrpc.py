@@ -1,206 +1,187 @@
 # coding=utf-8
-"""
-Tests for SmartRPyC
-"""
 
-import random
-
-import zmq
 import msgpack
 import pytest
 
-from smartrpyc.client import Client, RemoteException
-from smartrpyc.server import MethodsRegister
-from smartrpyc.utils import get_random_ipc_socket
-from smartrpyc.tests import utils
+from smartrpyc.client import RemoteException
+
+from smartrpyc.tests.functional.fixtures import (  # noqa
+    random_socket,
+    simple_server,
+    simple_server_thread,
+    simple_server_socket,
+    simple_server_client,
+)
 
 
-# noinspection PyUnusedLocal
-class TestSmartrpcFunctionality(object):
-    def get_methods(self):
+def test_simple_call(simple_server_socket):
+    socket = simple_server_socket
+    socket.send(msgpack.packb({
+        'm': 'method1',
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': 'Hello, world!'}
 
-        methods = MethodsRegister()
 
-        @methods.register
-        def method1(request):
-            return u"Hello, world!"
+def test_call_with_args(simple_server_socket):
+    socket = simple_server_socket
+    socket.send(msgpack.packb({
+        'm': 'method2',
+        'a': ['WORLD'],
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': 'Hello, WORLD!'}
 
-        @methods.register
-        def method2(request, name):
-            return u"Hello, {0}!".format(name)
 
-        @methods.register
-        def method3(request, greeting=u'Hello', name=u'world'):
-            if not isinstance(greeting, basestring):
-                raise ValueError("Greeting must be a string")
-            if not isinstance(name, basestring):
-                raise ValueError("Name must be a string")
-            return u"{0}, {1}!".format(greeting, name)
+def test_call_with_args_utf8(simple_server_socket):
+    socket = simple_server_socket
 
-        @methods.register
-        def get_list(request):
-            return ['this', 'is', 'a', 'list']
+    socket.send(msgpack.packb({
+        'm': 'method2',
+        'a': [u'WORLD'],
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': u'Hello, WORLD!'}
 
-        @methods.register
-        def get_dict(request):
-            return {'this': 'is', 'a': 'dict'}
+    socket.send(msgpack.packb({
+        'm': 'method2',
+        'a': [u'Ẅøřłđ'],
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': u'Hello, Ẅøřłđ!'}
 
-        @methods.register
-        def raise_value_error(request, *a, **kw):
-            raise ValueError
 
-        return methods
+def test_call_with_kwargs(simple_server_socket):
+    socket = simple_server_socket
+    socket.send(msgpack.packb({
+        'm': 'method2',
+        'k': {'name': 'WORLD'},
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': 'Hello, WORLD!'}
 
-    def test_simple_call(self):
-        addr = get_random_ipc_socket()
-        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
-            context = zmq.Context()
-            socket = context.socket(zmq.REQ)
-            socket.connect(addr)
-            socket.send(msgpack.packb({
-                'm': 'method1',
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': 'Hello, world!'}
 
-    def test_concurrent_calls(self):
-        # todo: this thing hangs forever in case an exception was raised
-        #       in the server -- figure out why!
-        addr = get_random_ipc_socket()
-        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
+def test_call_with_multi_args(simple_server_socket):
+    socket = simple_server_socket
 
-            context = zmq.Context()
-            sockets = {}
-            socket_ids = range(10)
+    socket.send(msgpack.packb({
+        'm': 'method3',
+        'k': {'name': 'WORLD'},
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': 'Hello, WORLD!'}
 
-            random.shuffle(socket_ids)
-            for i in socket_ids:
-                sockets[i] = context.socket(zmq.REQ)
-                sockets[i].connect(addr)
+    socket.send(msgpack.packb({
+        'm': 'method3',
+        'k': {'greeting': 'HOWDY'},
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': 'HOWDY, world!'}
 
-            random.shuffle(socket_ids)
-            for i in socket_ids:
-                sockets[i].send(msgpack.packb({
-                    'm': 'method2',
-                    'a': ['socket {0}'.format(i)],
-                }, encoding='utf-8'))
+    socket.send(msgpack.packb({
+        'm': 'method3',
+        'k': {'greeting': 'HOWDY', 'name': 'MAN'},
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': 'HOWDY, MAN!'}
 
-            random.shuffle(socket_ids)
-            for i in socket_ids:
-                response = msgpack.unpackb(sockets[i].recv(), encoding='utf-8')
-                assert response == {'r': 'Hello, socket {0}!'.format(i)}
+    socket.send(msgpack.packb({
+        'm': 'method3',
+        'a': ('hey', 'man'),
+    }, encoding='utf-8'))
+    response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+    assert response == {'r': 'hey, man!'}
 
-    def test_call_with_args(self):
-        addr = get_random_ipc_socket()
-        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
-            context = zmq.Context()
-            socket = context.socket(zmq.REQ)
-            socket.connect(addr)
-            socket.send(msgpack.packb({
-                'm': 'method2',
-                'a': ['WORLD'],
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': 'Hello, WORLD!'}
 
-    def test_call_with_args_utf8(self):
-        addr = get_random_ipc_socket()
-        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
+def test_with_client(simple_server_client):
+    client = simple_server_client
 
-            context = zmq.Context()
-            socket = context.socket(zmq.REQ)
-            socket.connect(addr)
+    assert client.method1() == 'Hello, world!'
 
-            socket.send(msgpack.packb({
-                'm': 'method2',
-                'a': [u'WORLD'],
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': u'Hello, WORLD!'}
+    assert client.method2(u'WORLD') == u'Hello, WORLD!'
+    assert client.method2(name=u'WORLD') == u'Hello, WORLD!'
+    assert client.method2(name=u'Ẅøřłđ') == u'Hello, Ẅøřłđ!'
 
-            socket.send(msgpack.packb({
-                'm': 'method2',
-                'a': [u'Ẅøřłđ'],
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': u'Hello, Ẅøřłđ!'}
+    assert client.method3('Hi', 'man') == 'Hi, man!'
+    assert client.method3(greeting='Hi', name='man') == 'Hi, man!'
+    assert client.method3(greeting='Hi') == 'Hi, world!'
 
-    def test_call_with_kwargs(self):
-        addr = get_random_ipc_socket()
-        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
-            context = zmq.Context()
-            socket = context.socket(zmq.REQ)
-            socket.connect(addr)
-            socket.send(msgpack.packb({
-                'm': 'method2',
-                'k': {'name': 'WORLD'},
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': 'Hello, WORLD!'}
+    with pytest.raises(RemoteException):
+        client.method3('HELLO', greeting='Hi')
 
-    def test_call_with_multi_args(self):
-        addr = get_random_ipc_socket()
-        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
-            context = zmq.Context()
-            socket = context.socket(zmq.REQ)
-            socket.connect(addr)
+    assert client.get_list() == ['this', 'is', 'a', 'list']
+    assert client.get_dict() == {'this': 'is', 'a': 'dict'}
 
-            socket.send(msgpack.packb({
-                'm': 'method3',
-                'k': {'name': 'WORLD'},
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': 'Hello, WORLD!'}
+    with pytest.raises(RemoteException):
+        client.raise_value_error()
 
-            socket.send(msgpack.packb({
-                'm': 'method3',
-                'k': {'greeting': 'HOWDY'},
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': 'HOWDY, world!'}
+    ## Ok, the method doesn't exist, no big deal..
+    with pytest.raises(RemoteException):
+        client.no_such_method()
 
-            socket.send(msgpack.packb({
-                'm': 'method3',
-                'k': {'greeting': 'HOWDY', 'name': 'MAN'},
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': 'HOWDY, MAN!'}
+    client.method1()  # The server must still be alive here..
 
-            socket.send(msgpack.packb({
-                'm': 'method3',
-                'a': ('hey', 'man'),
-            }, encoding='utf-8'))
-            response = msgpack.unpackb(socket.recv(), encoding='utf-8')
-            assert response == {'r': 'hey, man!'}
+    ##------------------------------------------------------------
+    ## Let's try with some exceptions
 
-    def test_with_client(self):
-        addr = get_random_ipc_socket()
-        with utils.TestingServer(methods=self.get_methods(), addresses=addr):
-            client = Client(addr)
-            assert client.method1() == 'Hello, world!'
+    ## Invalid method
+    with pytest.raises(RemoteException):
+        client.does_not_exist()
 
-            with pytest.raises(RemoteException):
-                client.method1('this', 'does not', 'accept arguments!')
+    ## Invalid arguments
+    with pytest.raises(RemoteException):
+        client.method1('this', 'does not', 'accept arguments!')
 
-            assert client.method2(u'WORLD') == u'Hello, WORLD!'
-            assert client.method2(name=u'WORLD') == u'Hello, WORLD!'
-            assert client.method2(name=u'Ẅøřłđ') == u'Hello, Ẅøřłđ!'
+    ## This method will raise an exception
+    with pytest.raises(RemoteException):
+        client.divide_by_zero()
 
-            assert client.method3('Hi', 'man') == 'Hi, man!'
-            assert client.method3(greeting='Hi', name='man') == 'Hi, man!'
-            assert client.method3(greeting='Hi') == 'Hi, world!'
 
-            with pytest.raises(RemoteException):
-                client.method3('HELLO', greeting='Hi')
+def test_smartrpyc_multi_route(simple_server_client):
+    client = simple_server_client
+    assert client['route1'].method1() == 'route1-method1'
+    assert client['route1'].method2() == 'route1-method2'
+    assert client['route1'].method3() == 'route1-method3'
+    assert client['route2'].method1() == 'route2-method1'
+    assert client['route2'].method2() == 'route2-method2'
+    assert client['route2'].method3() == 'route2-method3'
+    assert client['route3'].method1() == 'route3-method1'
 
-            assert client.get_list() == ['this', 'is', 'a', 'list']
-            assert client.get_dict() == {'this': 'is', 'a': 'dict'}
+    with pytest.raises(RemoteException):
+        client['doesnotexist'].my_method()
 
-            with pytest.raises(RemoteException):
-                client.raise_value_error()
+    with pytest.raises(RemoteException):
+        client['route1'].doesnotexist()
 
-            ## Ok, the method doesn't exist, no big deal..
-            with pytest.raises(RemoteException):
-                client.no_such_method()
 
-            client.method1()  # The server must still be alive here..
+## Concurrency is a separate topic, and is not supported yet!
+
+# def test_concurrent_calls(random_socket, simple_server):
+#     pytest.skip()
+#     server_thread = ServerProcessThread(simple_server, random_socket)
+#     server_thread.start()
+
+#     with Client(random_socket) as client1, \
+#             Client(random_socket) as client2, \
+#             Client(random_socket) as client3, \
+#             Client(random_socket) as client4, \
+#             Client(random_socket) as client5, \
+#             Client(random_socket) as client6:
+#         clients = list(enumerate([
+#             client1, client2, client3, client4, client5, client6]))
+
+#         ## Send requests in random order
+#         random.shuffle(clients)
+#         for i, client in clients:
+#             socket = client._socket
+#             socket.send(msgpack.packb({
+#                 'm': 'method2',
+#                 'a': ['socket {0}'.format(i)],
+#             }, encoding='utf-8'))
+
+#         ## Get responses in random order, and check responses
+#         random.shuffle(clients)
+#         for i, client in clients:
+#             socket = client._socket
+#             response = msgpack.unpackb(socket.recv(), encoding='utf-8')
+#             assert response == {'r': 'Hello, socket {0}!'.format(i)}
