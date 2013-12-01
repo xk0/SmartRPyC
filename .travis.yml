@@ -1,4 +1,4 @@
-## Travis CI configuration for SmartRPyC
+## Travis CI configuration for xk0/SmartRPyC
 
 branches:
   except:
@@ -21,6 +21,10 @@ install:
   - pip install tox --use-mirrors
 
 script: tox
+
+after_success:
+  - pip install python-coveralls
+  - coveralls
 
 matrix:
   allow_failures:
