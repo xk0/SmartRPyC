@@ -14,34 +14,63 @@ The library creation can happen in several ways:
   some state.
 """
 
-__all__ = ['MethodsRegisterBase', 'MethodsRegister', 'MethodsObject']
+import warnings
 
 
-class MethodsRegisterBase(object):
-    """
-    Base for the Method Register objects.
+__all__ = ['BaseMethodsRegister', 'SimpleMethodsRegister',
+           'MethodsRegister', 'MethodsObject']
 
-    This class provides an abstract of the methods that can (and should)
-    be exposed by a methods register object.
-    """
 
-    def register(self, func=None, name=None):
-        """Only used for registers supporting changes"""
+class BaseMethodsRegister(object):
+    def get_route(self, route):
         raise NotImplementedError
 
-    def lookup(self, method):
-        """
-        The most important method, returning the appropriate
-        method to be called.
-        """
+    def get_method(self, route, method):
         raise NotImplementedError
 
-    def list_methods(self):
-        """List all the supported methods"""
+    def list_routes(self, base=None):
         raise NotImplementedError
 
+    def list_methods(self, route=None):
+        raise NotImplementedError
 
-class MethodsRegister(MethodsRegisterBase):
+    def lookup(self, name):
+        warnings.warn("The lookup() method is deprecated. "
+                      "Use get_method() instead.", DeprecationWarning)
+        return self.get_method(None, name)
+
+
+class SimpleMethodsRegister(BaseMethodsRegister):
+    def __init__(self, routes=None, methods=None):
+        self._routes = routes or {}
+        self._methods = methods or {}
+
+    def get_route(self, route):
+        parts = filter(None, route.split('.', 1))
+        if len(parts) == 0:
+            return self
+        route = self._routes[parts[0]]
+        if len(parts > 1):
+            return route.get_route(parts[1])
+        return route
+
+    def get_method(self, route, method):
+        if route is None:
+            return self._methods[method]
+        return self.get_route(route).get_method(None, method)
+
+    def list_routes(self, base=None):
+        if base is None:
+            return self._routes.iterkeys()
+        return self.get_route(base).list_routes()
+
+    def list_methods(self, base=None):
+        if base is None:
+            return self._methods.iterkeys()
+        return self.get_route(base).list_methods()
+
+
+class MethodsRegister(SimpleMethodsRegister):
     """
     Register for methods to be exposed via RPC.
     Mostly a wrapper around a dict.
@@ -62,8 +91,6 @@ class MethodsRegister(MethodsRegisterBase):
 
         # then pass methods to the Server() constructor
     """
-    def __init__(self):
-        self._methods = {}
 
     def register(self, func=None, name=None):
         """
@@ -79,7 +106,7 @@ class MethodsRegister(MethodsRegisterBase):
         name = name or callable(func) and func.__name__
 
         def decorator(func):
-            self.store(name, func)
+            self._register(name, func)
             return func
 
         # If func is not None, it means the method
@@ -87,9 +114,11 @@ class MethodsRegister(MethodsRegisterBase):
         # or as a plain method. The function will be
         # registered by calling decorator, otherwise,
         # decorator will be returned.
-        return func and decorator(func) or decorator
+        if func is None:
+            return decorator
+        return decorator(func)
 
-    def store(self, name, function):
+    def _register(self, name, function):
         """
         Method used to finally register a
         function.
@@ -99,23 +128,32 @@ class MethodsRegister(MethodsRegisterBase):
         :params function:
             Callable function
         """
-        if not isinstance(name, basestring) and \
-                not callable(function):
-            # If we get here, most likely, the user has passed
-            # a non callable function. See unittest for a clearer
-            # example.
-            raise ValueError("Unsupported arguments to register: "
-                             "{0} and {1}".format(name, function))
+        if (name is not None) and not isinstance(name, basestring):
+            raise ValueError("Invalid name: must be a string")
+        if not callable(function):
+            raise ValueError("Invalid function: must be a callable")
+
+        if name is None:
+            name = function.__name__
+
         self._methods[name] = function
 
-    def lookup(self, method):
-        return self._methods[method]
+    def route(self, obj=None, name=None):
+        """
+        Register a new route
+        """
+        def decorator(obj):
+            self._route(name, obj)
+            return obj
+        if obj is None:
+            return decorator
+        return decorator(obj)
 
-    def list_methods(self):
-        return self._methods.keys()
+    def _route(self, name, obj):
+        self._routes[name] = obj
 
 
-class MethodsObject(MethodsRegisterBase):
+class MethodsObject(BaseMethodsRegister):
     """
     Objects wrapper register.
 
