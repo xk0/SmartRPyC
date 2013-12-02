@@ -1,10 +1,11 @@
-# from smartrpyc.tests.utils import unittest
-
 import pytest
-from smartrpyc.server import MethodsRegister
+
+from smartrpyc.server import MethodsRegister, MethodsObject
 
 
 def test_methods_register_no_regression():
+    """Regression test for methods registers"""
+
     register = MethodsRegister()
 
     ## Try registering stuff with the old interface
@@ -78,6 +79,8 @@ def test_methods_register():
     class ThisIsRoute4(MethodsRegister):
         pass
 
+    register.route(name='route5', obj=ThisIsRoute4())
+
     assert register.get_route('') == register
     assert register.get_route('route1') == route1
     assert register.get_route('route1.sub1') == route1_1
@@ -86,7 +89,7 @@ def test_methods_register():
     assert isinstance(register.get_route('route4'), ThisIsRoute4)
 
     assert sorted(register.list_routes()) == \
-        ['route1', 'route2', 'route3', 'route4']
+        ['route1', 'route2', 'route3', 'route4', 'route5']
     assert sorted(register.list_routes('route1')) == ['sub1']
     assert sorted(register.list_routes('route1.sub1')) == []
     assert sorted(register.list_routes('route2')) == []
@@ -108,6 +111,11 @@ def test_methods_register():
 
     assert register.get_method('route3', 'one')() == 'spam'
 
+    with pytest.raises(KeyError):
+        register.get_method('', 'invalid_method')
+    with pytest.raises(KeyError):
+        register.get_method('invalid_route', 'm1')
+
 
 def test_methods_register_validation():
     register = MethodsRegister()
@@ -119,3 +127,21 @@ def test_methods_register_validation():
         register.method(name='invalid', func='hello')
     with pytest.raises(TypeError):
         register.method(name=123, func=lambda x: x)
+
+
+def test_methods_object_register():
+    class MyObject(object):
+        def one(self):
+            return 'spam'
+
+        def two(self):
+            return 'eggs'
+
+        def three(self):
+            return 'bacon'
+
+    register = MethodsObject()
+    register.set_object(MyObject())
+
+    assert register.get_method('one')() == 'spam'
+    assert sorted(register.list_methods()) == ['one', 'three', 'two']

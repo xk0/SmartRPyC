@@ -162,9 +162,6 @@ class MethodsRegister(SimpleMethodsRegister):
         if name is None:
             if hasattr(obj, '__name__'):
                 name = obj.__name__
-            elif hasattr(obj, '__class__'):
-                ## This is since we allow registering instances
-                name = obj.__class__.__name__
 
         if not isinstance(name, basestring):
             raise TypeError("Invalid route name: must be a string (got {0!r})"
@@ -190,13 +187,11 @@ class MethodsObject(BaseMethodsRegister):
         self._obj = obj
 
     def get_method(self, method):
-        return getattr(self._object, method)
+        return getattr(self._obj, method)
 
     def list_methods(self):
-        return (m for m in dir(self._object)
+        return (m for m in dir(self._obj)
                 if not m.startswith('_'))
 
     def set_object(self, obj):
-        if self._object is not None:
-            raise RuntimeError("You cannot set the object twice.")
-        self._object = obj
+        self._obj = obj
