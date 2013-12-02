@@ -4,15 +4,13 @@ A small but powerful RPC library for Python, powered by [ZeroMQ].
 
 [ZeroMQ]: http://www.zeromq.org/
 
-**Master branch:**
-[![Build Status](https://travis-ci.org/xk0/SmartRPyC.png?branch=master)](https://travis-ci.org/xk0/SmartRPyC)
-[![Coverage Status](https://coveralls.io/repos/xk0/SmartRPyC/badge.png?branch=master)](https://coveralls.io/r/xk0/SmartRPyC?branch=master)
 
-**Development branch:**
-[![Build Status](https://travis-ci.org/xk0/SmartRPyC.png?branch=develop)](https://travis-ci.org/xk0/SmartRPyC)
-[![Coverage Status](https://coveralls.io/repos/xk0/SmartRPyC/badge.png?branch=develop)](https://coveralls.io/r/xk0/SmartRPyC?branch=develop)
+| Branch | Status | Coverage |
+| ---- | ---- | ---- |
+| master | [![Build Status](https://travis-ci.org/xk0/SmartRPyC.png?branch=master)](https://travis-ci.org/xk0/SmartRPyC) | [![Coverage Status](https://coveralls.io/repos/xk0/SmartRPyC/badge.png?branch=master)](https://coveralls.io/r/xk0/SmartRPyC?branch=master) |
+| develop | [![Build Status](https://travis-ci.org/xk0/SmartRPyC.png?branch=develop)](https://travis-ci.org/xk0/SmartRPyC) | [![Coverage Status](https://coveralls.io/repos/xk0/SmartRPyC/badge.png?branch=develop)](https://coveralls.io/r/xk0/SmartRPyC?branch=develop) |
 
-**PyPi Status:**
+[pypi](https://pypi.python.org/pypi/SmartRPyC) / [Crate.io](https://crate.io/packages/SmartRPyC/):
 [![PyPi version](https://pypip.in/v/SmartRPyC/badge.png)](https://crate.io/packages/SmartRPyC/)
 [![PyPi downloads](https://pypip.in/d/SmartRPyC/badge.png)](https://crate.io/packages/SmartRPyC/)
 
