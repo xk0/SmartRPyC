@@ -50,7 +50,7 @@ class SimpleMethodsRegister(BaseMethodsRegister):
         if len(parts) == 0:
             return self
         route = self._routes[parts[0]]
-        if len(parts > 1):
+        if len(parts) > 1:
             return route.get_route(parts[1])
         return route
 
@@ -92,7 +92,12 @@ class MethodsRegister(SimpleMethodsRegister):
         # then pass methods to the Server() constructor
     """
 
-    def register(self, func=None, name=None):
+    def register(self, *a, **kw):
+        warnings.warn("The register() method is deprecated. "
+                      "Use method() instead.", DeprecationWarning)
+        return self.method(*a, **kw)
+
+    def method(self, func=None, name=None):
         """
         Refer to class docstring
 
@@ -103,10 +108,12 @@ class MethodsRegister(SimpleMethodsRegister):
 
         # If name is None we'll get the name from the
         # function itself.
-        name = name or callable(func) and func.__name__
+        if (name is None) and callable(func):
+            assert isinstance(func.__name__, basestring)
+            name = func.__name__
 
         def decorator(func):
-            self._register(name, func)
+            self._add_method(name, func)
             return func
 
         # If func is not None, it means the method
@@ -116,9 +123,10 @@ class MethodsRegister(SimpleMethodsRegister):
         # decorator will be returned.
         if func is None:
             return decorator
+
         return decorator(func)
 
-    def _register(self, name, function):
+    def _add_method(self, name, function):
         """
         Method used to finally register a
         function.
@@ -128,28 +136,44 @@ class MethodsRegister(SimpleMethodsRegister):
         :params function:
             Callable function
         """
-        if (name is not None) and not isinstance(name, basestring):
-            raise ValueError("Invalid name: must be a string")
+        if not ((name is None) or isinstance(name, basestring)):
+            raise TypeError("Invalid name: must be a string (got {0!r})"
+                            "".format(name))
         if not callable(function):
-            raise ValueError("Invalid function: must be a callable")
+            raise TypeError("Invalid function: must be a callable")
 
-        if name is None:
-            name = function.__name__
+        # if name is None:
+        #     name = function.__name__
 
         self._methods[name] = function
 
-    def route(self, obj=None, name=None):
-        """
-        Register a new route
-        """
+    def route(self, obj=None, name=None, autocall=True):
+        """Register a new route"""
+
         def decorator(obj):
-            self._route(name, obj)
+            self._add_route(name, obj, autocall=autocall)
             return obj
+
         if obj is None:
             return decorator
         return decorator(obj)
 
-    def _route(self, name, obj):
+    def _add_route(self, name, obj, autocall=True):
+        if name is None:
+            if hasattr(obj, '__name__'):
+                name = obj.__name__
+            elif hasattr(obj, '__class__'):
+                ## This is since we allow registering instances
+                name = obj.__class__.__name__
+
+        if not isinstance(name, basestring):
+            raise TypeError("Invalid route name: must be a string (got {0!r})"
+                            "".format(name))
+
+        ## Trick to allow decorating class definitions
+        if autocall and callable(obj):
+            obj = obj()
+
         self._routes[name] = obj
 
 
@@ -161,13 +185,16 @@ class MethodsObject(BaseMethodsRegister):
     contained in the object passed to the constructor.
     """
 
-    _object = None
+    def __init__(self, routes=None, obj=None):
+        self._routes = routes or {}
+        self._obj = obj
 
-    def lookup(self, method):
+    def get_method(self, method):
         return getattr(self._object, method)
 
     def list_methods(self):
-        return [m for m in dir(self._object) if not m.startswith('_')]
+        return (m for m in dir(self._object)
+                if not m.startswith('_'))
 
     def set_object(self, obj):
         if self._object is not None:
